@@ -37,6 +37,10 @@
 #include <version.h>
 #include <begin.h>
 
+#ifdef WINDOWS
+#include <windows.h>
+#endif /* WINDOWS */
+
 /*#define DEBUG*/
 
 #define DEFAULT_INPUT_CODING_SYSTEM	AUTOSELECT
@@ -60,6 +64,13 @@ private char *lvHelpFile;
 
 #define LV_CONF 	"_lv"
 #endif /* MSDOS */
+
+#ifdef WINDOWS
+#define DEFAULT_OUTPUT_CODING_SYSTEM	SHIFT_JIS
+#define DEFAULT_KEYBOARD_CODING_SYSTEM	SHIFT_JIS
+
+#define LV_CONF 	"_lv"
+#endif /* WINDOWS */
 
 private char *filter = "zcat";
 
@@ -98,8 +109,28 @@ private void LvInit( char **argv )
     strcat( lvHelpFile, LV_HELP );
   }
 #else
+#ifdef WINDOWS
+  {
+    int i;
+    char exe[MAX_PATH];
+
+    GetModuleFileNameA(NULL, exe, sizeof(exe));
+    lvHelpFile = Malloc( strlen( exe ) + strlen( LV_HELP ) + 1 );
+    strcpy( lvHelpFile, exe );
+    for( i = strlen( lvHelpFile ) - 1 ; i >= 0 ; i-- ){
+      if( '/' == lvHelpFile[ i ] || '\\' == lvHelpFile[ i ] ){
+	i++;
+	break;
+      }
+    }
+    if( i < 0 ) i = 0;
+    lvHelpFile[ i ] = NULL;
+    strcat( lvHelpFile, LV_HELP );
+  }
+#else
   lvHelpFile = Malloc( strlen( LV_HELP_PATH LV_HELP ) + 1 );
   strcpy( lvHelpFile, LV_HELP_PATH LV_HELP );
+#endif /* WINDOWS */
 #endif /* MSDOS */
 }
 
@@ -376,7 +407,7 @@ private boolean_t LvOpen( conf_t *conf )
     if( NULL == (conf->fp = (FILE *)tmpfile()) )
       perror( "temporary file" ), exit( -1 );
 
-#ifdef MSDOS
+#if defined(MSDOS) || defined(WINDOWS)
     { int sout;
 
       sout = dup( 1 );
@@ -390,7 +421,7 @@ private boolean_t LvOpen( conf_t *conf )
 
       return TRUE;
     }
-#endif /* MSDOS */
+#endif /* MSDOS,WINDOWS */
 
 #ifdef UNIX
     { int fds[ 2 ], pid;
@@ -445,6 +476,15 @@ private boolean_t LvReconnect( conf_t *conf )
     close( 0 );
     dup( 1 );
 #endif /* MSDOS */
+#ifdef WINDOWS
+    conf->file = "(stdin)";
+    if( NULL == (conf->fp = (FILE *)tmpfile()) )
+      perror( "temporary file" ), exit( -1 );
+    if( NULL == (conf->sp = fdopen( dup( fileno(stdin) ), "rb" )) )
+      StdinDuplicationFailed();
+    close( fileno(stdin) );
+    dup( fileno(stdout) );
+#endif /* WINDOWS */
 #ifdef UNIX
     struct stat sbuf;
 

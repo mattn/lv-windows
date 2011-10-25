@@ -341,9 +341,9 @@ private void CommandShellEscape( unsigned int arg )
 {
   i_str_t *istr;
   boolean_t flagPattern = FALSE;
-#ifdef MSDOS
+#if defined(MSDOS) || defined(WINDOWS)
   char *shell;
-#endif /* MSDOS */
+#endif /* MSDOS,WINDOWS */
 
   ConsoleShellEscape();
 
@@ -357,14 +357,14 @@ private void CommandShellEscape( unsigned int arg )
   FileRefresh( f );
   IstrFreeAll();
 
-#ifdef MSDOS
+#if defined(MSDOS) || defined(WINDOWS)
   if( shell = getenv( "SHELL" ) )
     spawnlp( 0, shell, shell, NULL );
   else if( shell = getenv( "COMSPEC" ) )
     spawnlp( 0, shell, shell, NULL );
   else
     label = "shell unknown";
-#endif /* MSDOS */
+#endif /* MSDOS,WINDOWS */
 
 #ifdef UNIX
   ConsoleSuspend();

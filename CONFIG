@@ -71,4 +71,10 @@ O = o
 #LIB = -k-s1000 -m
 #O = obj
 
+# WINDOWS
+#CC = gcc
+#CFLAGS = -I. -DWINDOWS -funsigned-char
+#LIB = -lkernel32 -lshell32
+#O = o
+
 ## -h -g

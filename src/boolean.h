@@ -15,7 +15,7 @@
 #define NULL		0
 #endif
 
-#ifdef SYSV
+#if defined(SYSV) || defined(WINDOWS)
 
 #ifndef FALSE
 #define FALSE		NULL

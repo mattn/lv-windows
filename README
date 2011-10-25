@@ -23,11 +23,11 @@ INSTALLATION:
 
     0) Expand lv archive, using LHa on MSDOS, or gunzip/tar on UNIX.
     1) Edit ``CONFIG'' to configure compiler flags.
-    2) Execute ``make dos'' on MSDOS, or only ``make'' on UNIX.
+    2) Execute ``make dos'' on MSDOS, or only ``make'' on WINDOWS/UNIX.
 	(However, lv archive for MSDOS does not contain source files.
 	``lv.exe'' is bundled instead.)
     3) Copy ``lv.hlp'', brief help description, to the same directory
-	as lv.exe located on MSDOS, or /usr/local/lib/lv/ on UNIX.
+	as lv.exe located on MSDOS/WINDOWS, or /usr/local/lib/lv/ on UNIX.
 
 ------------------------------------------------------------------------------
 NARITA Tomio

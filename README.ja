@@ -26,11 +26,11 @@
 
     0) 書庫を展開する. MSDOS 版は LHa, UNIX 版は gunzip と tar を使う.
     1) 御自分の環境に合せて ``CONFIG'' を編集し, コンパイラフラグを設定する.
-    2) UNIX では ``make'', MSDOS では ``make dos'' を実行する.
+    2) WINDOWS/UNIX では ``make'', MSDOS では ``make dos'' を実行する.
 	(ただし MSDOS 版の書庫にソースは含まれません.
 	コンパイル済みの ``lv.exe'' が添付されています.)
     3) ヘルプファイル ``lv.hlp'' を, UNIX では /usr/local/lib/lv/ に,
-       MSDOS では実行される lv.exe と同じディレクトリに置く.
+       MSDOS/WINDOWS では実行される lv.exe と同じディレクトリに置く.
        日本語のヘルプ (help.ja) も用意しています. それらのファイルは
        ``lv.hlp'' と差し替えて使用してください.
 
