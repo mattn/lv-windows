@@ -1,0 +1,152 @@
+# lv: a Powerful Multilingual File Viewer
+# All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+
+OOppttiioonnss aabboouutt CCooddiinngg ssyysstteemmss:
+  -A<coding-system>: Set all coding systems to coding-system.
+  -I<coding-system>: Set input coding system to coding-system.
+  -K<coding-system>: Set keyboard coding system to coding-system.
+  -O<coding-system>: Set output coding system to coding-system.
+
+    coding-system:
+      a: auto-select (input only)
+      c: iso-2022-cn
+      j: iso-2022-jp
+      k: iso-2022-kr
+      e: Extended Unix Code
+	ec: euc-china
+	ej: euc-japan
+	ek: euc-korea
+        et: euc-taiwan
+      u: UCS transformation format
+	u7: UTF-7
+	u8: UTF-8
+      l: iso-8859-*
+	l1..9: iso-8859-1..9
+      s: shift-jis
+      b: big5
+      r: raw mode
+
+  Examples:
+    -Il2: input coding system is iso-8859-2
+    -Ks:  keyboard coding system is shift-jis
+    -Oek: output coding system is euc-korea
+    -Ab:  all coding systems are big5
+
+  Conversions:
+    iso-2022-cn, -jp, -kr can be converted into euc-china or -taiwan,
+    euc-japan, euc-korea, respectively, and vice versa. shift-jis uses
+    the same internal code-points as iso-2022-jp and euc-japan. Similarly,
+    big5 can be handled like iso-2022-cn and euc-taiwan inside lv.
+    You can convert charsets among these coding systems from input to output. 
+
+OOtthheerr ooppttiioonnss:
+  -W<number>	Screen width
+  -H<number>	Screen height
+  -z		Assert there is no delete/insert-lines control.
+		Please set this option on MSDOS ANSI terminals which do not
+		have control to delete and/or insert lines. Meanwhile, as to
+		termcap and terminfo version, it will be set automatically.
+
+  -Ss<seq>	Set ANSI Standout sequence to <seq>  (default "7")
+  -Sr<seq>	Set ANSI Reverse sequence to <seq>   (default "7")
+  -Sb<seq>	Set ANSI Blink sequence to <seq>     (default "5")
+  -Su<seq>	Set ANSI Underline sequence to <seq> (default "4")
+  -Sh<seq>	Set ANSI Highlight sequence to <seq> (default "1")
+
+  -T<number>	Set Threshold-code which divides Unicode code-points in
+		two regions. Characters belonging to the lower region are
+		assumed to have a width of one, and the higher characters
+		are equated to a width of two. (Default: 12288)
+  -m		Force Unicode code-points which have the same glyphs as
+		iso-8859-* to be Mapped iso-8859-* in a conversion from
+		Unicode to another character set which also has the
+		corresponding code-points, in particular, Asian charsets.
+
+  -c		Allow ANSI escape sequences for text decoration (Color)
+  -d		Make regexp-searches ignore case (case folD search)
+  -f		Substitute Fixed strings for regular expressions
+  -p		Force non-regular files to be Printed immediately
+  -s		Force old pages to be swept out from the screen Smoothly
+  -u		Unify several character sets, eg. JIS X0208 and C6226.
+		In addition, lv equates ISO 646 variants and unknown
+		charsets with ASCII.
+
+  -@		Clear all options
+		You can also turn OFF specified options,
+		using ``+<option>'' like +c, +d, ... +z.
+
+  -		Treat the following arguments as filenames
+
+  -v		Show lv version
+  -h		Show this help
+
+CCoonnffiigguurraattiioonn:
+    Options can be described in configuration file ``.lv'' (``_lv'' on MSDOS)
+    located at you HOME directory and/or current working directory.
+    They can be also described in the environment variable LV. All
+    configuration is overloaded in this order if there is. Command line
+    options are always read finally.
+
+    Environment examples:
+	UNIX:  setenv LV '-Kej -Oej'
+	MSDOS: set LV=-Im -H25
+
+CCoommmmaanndd kkeeyy bbiinnddiinnggss:
+  0-9:		Argument
+  g, <:		Jump to the line number (default: top of the file)
+  G, >:		Jump to the line number (default: bottom of the file)
+  p:		Jump to the percentage position in line numbers (0-100)
+
+  b, C-b:			Previous page
+  u, C-u:			Previous half page
+  k, C-k, y, C-y, C-p:		Previous line
+
+  j, C-j, e, C-e, C-n, CR:	Next line
+  d, C-d:			Next half page
+  f, C-f, C-v, SP:		Next page
+
+  /<string>:	Find a string in the forward direction (regular expression)
+  ?<string>:	Find a string in the backward direction (regular expression)
+
+  n:		Repeat previous search in forward direction
+  N:		Repeat previous search in backward direction (not REVERSE)
+
+  C-l:		Redisplay all lines
+  r, C-r:	Refresh screen and memory
+  R:		Reload the current file
+
+  C-g:		Show file information (filename, position, coding system)
+  V:		Show LV version
+
+  C-z:		Suspend (call SHELL or ``command.com'' on MSDOS)
+  q, Q:		Quit
+
+SSttrriinngg iinnppuutt kkeeyy bbiinnddiinnggss:
+  C-m, CR:	Enter the current string
+  C-h, BS:	Delete one character (backspace)
+  C-u:		Cancel the current string and try again
+  C-p:		Restore a few old strings incrementally (history)
+  C-g:		Quit
+
+RReegguullaarr eexxpprreessssiioonnss:
+  Special characters are ^, $, ., *, +, ?, [, ^, -,  ], \.
+  \| specifies an alternative. \(, \) is a grouping construct.
+  \1 and \2 matches any charset consists of one- or two- column(s)
+  characters respectively. Mutually overlapping ranges (or charset)
+  are not guaranteed.
+
+NNootteess:
+    MMSSDDOOSS VVEERRSSIIOONN OOFF LLVV HHAASS NNOONNEE OOFF TTHHEE UUNNIICCOODDEE FFAACCIILLIITTYY AATT AALLLL.
+
+    The search function of lv does not work correctly when lv additionally
+    performs ``code'' conversion (not ``coding system conversion''),
+    because visible codes and internal codes are different from each other.
+    This problem happens when you output CNS characters through big5,
+    or in other conversions, especially, via Unicode. In such case,
+    however, you can avoid such problem by reading a pre-converted stream.
+    For example, when you wish to read a big5 stream on a UTF-8 terminal,
+    you can use a pipe like this: ``lv -Ib foo.big5 -Ou | lv -Au''
+
+    You can redirect this help message to a file. 'Q' or 'q' terminates lv.
+
+                                                             Happy lv'ing!

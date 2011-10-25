@@ -1,0 +1,35 @@
+------------------------------------------------------------------------------
+
+  Documentation of lv is located on the web. See the following URL:
+
+    http://www.mt.cs.keio.ac.jp/person/narita/lv/
+
+------------------------------------------------------------------------------
+
+COPYRIGHT:
+
+  lv is a freeware. We grant you to use and copy lv and all
+  contents of its archive. You are also permitted to modify lv
+  and distribute the modified software if there is an obvious
+  annotation which represents the software is lv-derived in your
+  documentation. Naturally, we disclaim any kind of warranty
+  around lv, that is to say, you can use lv on your own risk.
+
+  All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio.
+
+------------------------------------------------------------------------------
+
+INSTALLATION:
+
+    0) Expand lv archive, using LHa on MSDOS, or gunzip/tar on UNIX.
+    1) Edit ``CONFIG'' to configure compiler flags.
+    2) Execute ``make dos'' on MSDOS, or only ``make'' on UNIX.
+	(However, lv archive for MSDOS does not contain source files.
+	``lv.exe'' is bundled instead.)
+    3) Copy ``lv.hlp'', brief help description, to the same directory
+	as lv.exe located on MSDOS, or /usr/local/lib/lv/ on UNIX.
+
+------------------------------------------------------------------------------
+NARITA Tomio
+email: narita@mt.cs.keio.ac.jp
+Homepage: http://www.mt.cs.keio.ac.jp/person/narita.html

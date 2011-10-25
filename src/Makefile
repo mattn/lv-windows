@@ -1,0 +1,287 @@
+########################################################################
+# Makefile for lv binary
+#   target: all, dos, big5cnsmap, map, rev, clean, dosclean
+########################################################################
+
+include ../CONFIG
+
+SHELL = /bin/sh
+
+########################################################################
+# You don't have to change the following.
+########################################################################
+
+all: lv
+
+OBJS = itable.$(O) ctable.$(O) \
+	uty.$(O) istr.$(O) file.$(O) \
+	decode.$(O) encode.$(O) escape.$(O) iso2022.$(O) \
+	iso2cn.$(O) iso2jp.$(O) iso2kr.$(O) \
+	eucjapan.$(O) shiftjis.$(O) big5.$(O) raw.$(O) \
+	fetch.$(O) screen.$(O) command.$(O) display.$(O) \
+	find.$(O) re.$(O) nfa.$(O) dfa.$(O) \
+	conv.$(O) lv.$(O)
+
+UNIOBJS = utf.$(O) unimap.$(O) unirev.$(O)
+
+lv: $(OBJS) $(UNIOBJS) consunix.$(O)
+	$(CC) -o $@ $(OBJS) $(UNIOBJS) consunix.$(O) $(LIB)
+
+dos: lv.exe
+
+lv.exe: $(OBJS) consdos.$(O)
+	$(CC) @${ -o $@ $(OBJS) consdos.$(O) $(LIB) }
+
+lv.$(O): lv.c conv.h itable.h ctable.h file.h console.h command.h version.h find.h encode.h uty.h istr.h decode.h re.h unimap.h display.h
+	$(CC) -c -o $@ $(CFLAGS) lv.c
+
+conv.h: file.h
+	touch $@
+conv.$(O): conv.c conv.h file.h encode.h decode.h uty.h
+	$(CC) -c -o $@ $(CFLAGS) conv.c
+
+itable_t.h: ascii.h attr.h ichar.h
+	touch $@
+
+itable.h: itable_t.h itable_e.h
+	touch $@
+itable.$(O): itable.c itable.h
+	$(CC) -c -o $@ $(CFLAGS) itable.c
+
+ctable.h: ctable_t.h ctable_e.h ascii.h
+	touch $@
+ctable.$(O): ctable.c ctable.h itable.h
+	$(CC) -c -o $@ $(CFLAGS) ctable.c
+
+istr.h: ichar.h
+	touch $@
+istr.$(O): istr.c istr.h itable.h file.h uty.h
+	$(CC) -c -o $@ $(CFLAGS) istr.c
+
+file.h: itable.h ctable.h str.h
+	touch $@
+file.$(O): file.c file.h decode.h console.h uty.h
+	$(CC) -c -o $@ $(CFLAGS) file.c
+
+fetch.h: file.h
+	touch $@
+fetch.$(O): fetch.c fetch.h decode.h find.h uty.h
+	$(CC) -c -o $@ $(CFLAGS) fetch.c
+
+re.h: itable.h
+	touch $@
+re.$(O): re.c re.h uty.h find.h
+	$(CC) -c -o $@ $(CFLAGS) re.c
+
+nfa.h: re.h
+	touch $@
+nfa.$(O): nfa.c nfa.h itable.h re.h uty.h
+	$(CC) -c -o $@ $(CFLAGS) nfa.c
+
+dfa.h: istr.h
+	touch $@
+dfa.$(O): dfa.c dfa.h itable.h uty.h re.h nfa.h find.h
+	$(CC) -c -o $@ $(CFLAGS) dfa.c
+
+find.h: itable.h file.h
+	touch $@
+find.$(O): find.c find.h fetch.h decode.h screen.h position.h console.h dfa.h istr.h
+	$(CC) -c -o $@ $(CFLAGS) find.c
+
+
+decode.h: itable.h ctable.h istr.h str.h
+	touch $@
+decode.$(O): decode.c decode.h iso2022.h shiftjis.h big5.h raw.h utf.h uty.h
+	$(CC) -c -o $@ $(CFLAGS) decode.c
+
+iso2022.h: ctable.h itable.h
+	touch $@
+iso2022.$(O): iso2022.c iso2022.h decode.h escape.h
+	$(CC) -c -o $@ $(CFLAGS) iso2022.c
+
+escape.h: ctable.h
+	touch $@
+escape.$(O): escape.c escape.h decode.h console.h
+	$(CC) -c -o $@ $(CFLAGS) escape.c
+
+encode.h: itable.h ctable.h istr.h str.h
+	touch $@
+encode.$(O): encode.c encode.h iso2cn.h iso2jp.h iso2kr.h eucjapan.h shiftjis.h big5.h utf.h raw.h
+	$(CC) -c -o $@ $(CFLAGS) encode.c
+
+iso2cn.h: ctable.h itable.h
+	touch $@
+iso2cn.$(O): iso2cn.c iso2cn.h encode.h big5.h unimap.h
+	$(CC) -c -o $@ $(CFLAGS) iso2cn.c
+
+iso2jp.h: ctable.h itable.h
+	touch $@
+iso2jp.$(O): iso2jp.c iso2jp.h encode.h big5.h unimap.h
+	$(CC) -c -o $@ $(CFLAGS) iso2jp.c
+
+iso2kr.h: ctable.h itable.h
+	touch $@
+iso2kr.$(O): iso2kr.c iso2kr.h encode.h big5.h unimap.h
+	$(CC) -c -o $@ $(CFLAGS) iso2kr.c
+
+eucjapan.h: itable.h
+	touch $@
+eucjapan.$(O): eucjapan.c eucjapan.h encode.h big5.h unimap.h
+	$(CC) -c -o $@ $(CFLAGS) eucjapan.c
+
+shiftjis.h: itable.h ctable.h
+	touch $@
+shiftjis.$(O): shiftjis.c shiftjis.h decode.h encode.h escape.h big5.h unimap.h
+	$(CC) -c -o $@ $(CFLAGS) shiftjis.c
+
+big5.h: itable.h ctable.h
+	touch $@
+big5.$(O): big5.c big5.h decode.h encode.h escape.h uty.h unimap.h
+	$(CC) -c -o $@ $(CFLAGS) big5.c
+
+utf.h: itable.h ctable.h
+	touch $@
+utf.$(O): utf.c utf.h decode.h escape.h encode.h unirev.h
+	$(CC) -c -o $@ $(CFLAGS) utf.c
+
+raw.h: itable.h
+	touch $@
+raw.$(O): raw.c raw.h decode.h encode.h
+	$(CC) -c -o $@ $(CFLAGS) raw.c
+
+unimap.h: ichar.h
+	touch $@
+unimap.$(O): unimap.c unimap.h itable.h uty.h big5.h
+	$(CC) -c -o $@ $(CFLAGS) unimap.c
+
+unirev.h: ichar.h
+	touch $@
+unirev.$(O): unirev.c unirev.h itable.h uty.h big5.h
+	$(CC) -c -o $@ $(CFLAGS) unirev.c
+
+command.h: file.h
+	touch $@
+command.$(O): command.c command.h itable.h istr.h encode.h decode.h find.h screen.h console.h display.h position.h version.h dfa.h uty.h fetch.h keybind.h
+	$(CC) -c -o $@ $(CFLAGS) command.c
+
+position.h: file.h
+	touch $@
+
+screen.h: file.h
+	touch $@
+screen.$(O): screen.c screen.h position.h fetch.h console.h
+	$(CC) -c -o $@ $(CFLAGS) screen.c
+
+display.h: file.h
+	touch $@
+display.$(O): display.c display.h screen.h console.h encode.h fetch.h position.h
+	$(CC) -c -o $@ $(CFLAGS) display.c
+
+console.h: str.h
+	touch $@
+consunix.$(O): console.c console.h ascii.h attr.h
+	$(CC) -c -o $@ $(CFLAGS) console.c
+consdos.$(O): console.c console.h ascii.h attr.h
+	$(CC) -c -o $@ $(CFLAGS) console.c
+
+uty.h: ichar.h
+	touch $@
+uty.$(O): uty.c uty.h itable.h
+	$(CC) -c -o $@ $(CFLAGS) uty.c
+
+#
+# big5-cns map files
+#
+
+big5cnsmap: big5cns1.map big5cns2.map cns1big5.map cns2big5.map 
+
+big5cns1.map:
+	big5cns.pl -i 'zcat b1cns1.dat.gz |' > big5cns1.map
+big5cns2.map:
+	big5cns.pl -i 'zcat b2cns2.dat.gz |' > big5cns2.map
+
+cns1big5.map:
+	cnsbig5.pl -i 'zcat b1cns1.dat.gz |' > cns1big5.map
+cns2big5.map:
+	cnsbig5.pl -i 'zcat b2cns2.dat.gz |' > cns2big5.map
+
+#
+# map files
+#
+
+map: big5.map gb2312.map iso8859.map jis.map ksc5601.map
+
+big5.map:
+	mapbig5.pl > $@
+
+gb2312.map:
+	mapgb.pl > $@
+
+iso8859.map:
+	map8859.pl > $@
+
+jis.map:
+	mapjis.pl > $@
+
+ksc5601.map:
+	mapksc.pl > $@
+
+#
+# rev files
+#
+
+rev: big5.rev gb2312.rev jis0208.rev jis0212.rev ksc5601.rev \
+	iso88592.rev iso88593.rev iso88594.rev iso88595.rev \
+	iso88596.rev iso88597.rev iso88598.rev iso88599.rev
+
+big5.rev:
+	revbig5.pl > $@
+
+gb2312.rev:
+	revgb.pl > $@
+
+jis0208.rev:
+	rev0208.pl > $@
+
+jis0212.rev:
+	rev0212.pl > $@
+
+ksc5601.rev:
+	revksc.pl > $@
+
+iso88592.rev:
+	rev8859.pl -s 2 -i 'zcat 8859-2.TXT.gz |' > $@
+
+iso88593.rev:
+	rev8859.pl -s 3 -i 'zcat 8859-3.TXT.gz |' > $@
+
+iso88594.rev:
+	rev8859.pl -s 4 -i 'zcat 8859-4.TXT.gz |' > $@
+
+iso88595.rev:
+	rev8859.pl -s 5 -i 'zcat 8859-5.TXT.gz |' > $@
+
+iso88596.rev:
+	rev8859.pl -s 6 -i 'zcat 8859-6.TXT.gz |' > $@
+
+iso88597.rev:
+	rev8859.pl -s 7 -i 'zcat 8859-7.TXT.gz |' > $@
+
+iso88598.rev:
+	rev8859.pl -s 8 -i 'zcat 8859-8.TXT.gz |' > $@
+
+iso88599.rev:
+	rev8859.pl -s 9 -i 'zcat 8859-9.TXT.gz |' > $@
+
+#
+# cleaning
+#
+
+clean:
+	for file in lv $(OBJS) $(UNIOBJS) consunix.o ; \
+	do \
+		if [ -f $$file ]; then rm $$file ; fi \
+	done
+
+dosclean:
+	rm *.obj

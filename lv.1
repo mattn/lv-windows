@@ -1,0 +1,226 @@
+.TH LV 1 "v.4.21 (Mar.26th,1997)"
+.SH NAME
+lv: a Powerful Multilingual File Viewer
+.SH SYNOPSIS
+.B lv
+-h
+.br
+.B lv
+-v
+.br
+.B lv
+[-[+]cdfmpsuz] [-] [\fIfilename\fP]
+.br
+     [-I\fIcoding-system\fP] [-K\fIcoding-system\fP] [-O\fIcoding-system\fP]
+.br
+     [-A\fIcoding-system\fP]
+.br
+     [-Ss\fIseq\fP] [-Sr\fIseq\fP] [-Sb\fIseq\fP] [-Su\fIseq\fP] [-Sh\fIseq\fP]
+.br
+     [-W\fIwidth\fP] [-H\fIheight\fP] [-@]
+.SH DESCRIPTION
+lv is a multilingual file viewer which enables you to read texts
+written in multiple languages, especially, in Asian languages.
+Apparently, lv looks like \fIless\fP (1),
+a representative file viewer on UNIX as you know,
+so UNIX people (and \fIless\fP people on other OSs)
+don't have to learn a burdensome new interface.
+lv can be used on MSDOS ANSI terminals and almost all UNIX platforms.
+lv is a currently growing software,
+so your feedback is welcome
+and helpful for us to refine the future lv.
+.SH "OPTIONS"
+.IP "-A<\fIcoding-system\fP>"
+Set all coding systems to \fIcoding-system\fP.
+.IP "-I<\fIcoding-system\fP>"
+Set input coding system to \fIcoding-system\fP.
+.IP "-K<\fIcoding-system\fP>"
+Set keyboard coding system to \fIcoding-system\fP.
+.IP "-O<\fIcoding-system\fP>"
+Set output coding system to \fIcoding-system\fP.
+.IP "coding-system:"
+a: auto-select (input only)
+.br
+c: iso-2022-cn
+.br
+j: iso-2022-jp
+.br
+k: iso-2022-kr
+.br
+ec: euc-china
+.br
+ej: euc-japan
+.br
+ek: euc-korea
+.br
+et: euc-taiwan
+.br
+u7: UTF-7
+.br
+u8: UTF-8
+.br
+l1..9: iso-8859-1..9
+.br
+s: shift-jis
+.br
+b: big5
+.br
+r: raw mode
+.IP "Examples:"
+-Il2: input coding system is iso-8859-2
+.br
+-Ks:  keyboard coding system is shift-jis
+.br
+-Oek: output coding system is euc-korea
+.br
+-Ab:  all coding systems are big5
+.IP "Conversions:"
+iso-2022-cn, -jp, -kr can be converted into euc-china or -taiwan,
+euc-japan, euc-korea, respectively, and vice versa. shift-jis uses
+the same internal code-points as iso-2022-jp and euc-japan. Similarly,
+big5 can be handled like iso-2022-cn and euc-taiwan inside lv.
+You can convert charsets among these coding systems
+from input to output.
+.br
+.IP "-W<\fInumber\fP>"
+Screen width
+.IP "-H<\fInumber\fP>"
+Screen height
+.IP "-z"
+Assert there is no delete/insert-lines control
+.br
+Please set this option on MSDOS ANSI terminals
+which do not have control to delete and/or insert lines.
+Meanwhile, as to termcap and terminfo version,
+it will be set automatically.
+.IP "-Ss<\fIseq\fP>"
+Set ANSI Standout sequence to \fIseq\fP  (default "7")
+.IP "-Sr<\fIseq\fP>"
+Set ANSI Reverse sequence to \fIseq\fP   (default "7")
+.IP "-Sb<\fIseq\fP>"
+Set ANSI Blink sequence to \fIseq\fP     (default "5")
+.IP "-Su<\fIseq\fP>"
+Set ANSI Underline sequence to \fIseq\fP (default "4")
+.IP "-Sh<\fIseq\fP>"
+Set ANSI Highlight sequence to \fIseq\fP (default "1")
+.br
+.IP "-T<\fInumber\fP>"
+Set Threshold-code which divides Unicode code-points in
+two regions. Characters belonging to the lower region are
+assumed to have a width of one, and the higher characters
+are equated to a width of two. (Default: 12288)
+.IP "-m"
+Force Unicode code-points which have the same glyphs as
+iso-8859-* to be Mapped iso-8859-* in a conversion from
+Unicode to another character set which also has the
+corresponding code-points, in particular, Asian charsets.
+.br
+.IP "-c"
+Allow ANSI escape sequences for text decoration (Color)
+.IP "-d"
+Make regexp-searches ignore case (case folD search)
+.IP "-f"
+Substitute Fixed strings for regular expressions
+.IP "-p"
+Force non-regular files to be Printed immediately
+.IP "-s"
+Force old pages to be swept out from the screen Smoothly
+.IP "-u"
+Unify several character sets, eg. JIS X0208 and C6226.
+In addition, lv equates ISO 646 variants
+and unknown charsets with ASCII.
+.br
+.IP "-@"
+Clear all options
+.br
+You can turn OFF specified options,
+using ``+<option>'' like +c, +d, ... +z.
+.IP "-"
+Treat the following arguments as filenames
+.IP "-v"
+Show lv version
+.IP "-h"
+Show this help
+.SH "CONFIGURATION"
+Options can be described in configuration file ``.lv'' (``_lv'' on MSDOS)
+located at you HOME directory and/or current working directory.
+They can be also described in the environment variable LV. All
+configuration is overloaded in this order if there is. Command line
+options are always read finally.
+.SH "COMMAND KEY BINDINGS"
+.IP "0..9:"
+Argument
+.IP "g, <:"
+Jump to the line number (default: top of the file)
+.IP "G, >:"
+Jump to the line number (default: bottom of the file)
+.IP "p:"
+Jump to the percentage position in line numbers (0-100)
+.IP "b, C-b:"
+Previous page
+.IP "u, C-u:"
+Previous half page
+.IP "k, C-k, y, C-y, C-p:"
+Previous line
+.IP "j, C-j, e, C-e, C-n, CR:"
+Next line
+.IP "d, C-d:"
+Next half page
+.IP "f, C-f, C-v, SP:"
+Next page
+.IP "/<string>:"
+Find a string in the forward direction (regular expression)
+.IP "?<string>:"
+Find a string in the backward direction (regular expression)
+.IP "n:"
+Repeat previous search in forward direction
+.IP "N:"
+Repeat previous search in backward direction (not REVERSE)
+.IP "C-l:"
+Redisplay all lines
+.IP "r, C-r:"
+Refresh screen and memory
+.IP "R:"
+Reload current file
+.IP "C-g:"
+Show file information (filename, position, coding system)
+.IP "V:"
+Show LV version
+.IP "C-z:"
+Suspend (call SHELL or ``command.com'' under MSDOS)
+.IP "q, Q:"
+Quit
+.SH "STRING INPUT KEY BINDINGS"
+.IP "C-m, CR:"
+Enter the current string
+.IP "C-h, BS:"
+Delete one character (backspace)
+.IP "C-u:"
+Cancel the current string and try again
+.IP "C-p:"
+Restore a few old strings incrementally (history)
+.IP "C-g:"
+Quit
+.SH "REGULAR EXPRESSION"
+Special characters are ^, $, ., *, +, ?, [, ^, -,  ], \\.
+\\| specifies an alternative. \\(, \\) is a grouping construct.
+\\1 and \\2 matches any charset consists of one- or two- column(s)
+characters respectively. Mutually overlapping ranges (or charset)
+are not guaranteed.
+.SH "NOTES
+.B "MSDOS VERSION OF LV HAS NONE OF THE UNICODE FACILITY AT ALL."
+.sp
+The search function of lv does not work correctly when lv additionally
+performs ``code'' conversion (not ``coding system conversion''),
+because visible codes and internal codes are different from each other.
+This problem happens when you output CNS characters through big5,
+or in other conversions, especially, via Unicode. In such case,
+however, you can avoid such problem by reading a pre-converted stream.
+For example, when you wish to read a big5 stream on a UTF-8 terminal,
+you can use a pipe like this: ``lv -Ib foo.big5 -Ou | lv -Au''
+.SH "SEE ALSO"
+LV Homepage: http://www.mt.cs.keio.ac.jp/person/narita/lv/
+.SH "COPYRIGHT"
+Copyright (C) 1994,1997 by NARITA Tomio.
+.sp
+Bug reports to: narita@mt.cs.keio.ac.jp
