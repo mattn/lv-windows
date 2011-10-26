@@ -70,6 +70,7 @@ private char *lvHelpFile;
 #define DEFAULT_KEYBOARD_CODING_SYSTEM	SHIFT_JIS
 
 #define LV_CONF 	"_lv"
+private char *tmpf = NULL;
 #endif /* WINDOWS */
 
 private char *filter = "zcat";
@@ -114,7 +115,7 @@ private void LvInit( char **argv )
     int i;
     char exe[MAX_PATH];
 
-    GetModuleFileNameA(NULL, exe, sizeof(exe));
+    GetModuleFileNameA( NULL, exe, sizeof(exe) );
     lvHelpFile = Malloc( strlen( exe ) + strlen( LV_HELP ) + 1 );
     strcpy( lvHelpFile, exe );
     for( i = strlen( lvHelpFile ) - 1 ; i >= 0 ; i-- ){
@@ -404,56 +405,83 @@ private boolean_t LvOpen( conf_t *conf )
     /*
      * zcat
      */
+#ifdef MSDOS
+    int sout;
+
+    /*
+     * zcat
+     */
     if( NULL == (conf->fp = (FILE *)tmpfile()) )
       perror( "temporary file" ), exit( -1 );
 
-#if defined(MSDOS) || defined(WINDOWS)
-    { int sout;
+    sout = dup( 1 );
+    close( 1 );
+    dup( fileno( conf->fp ) );
+    if( 0 > spawnlp( 0, filter, filter, conf->file, NULL ) )
+      FatalErrorOccurred();
+    close( 1 );
+    dup( sout );
+    rewind( conf->fp );
+    return TRUE;
+#endif /* MSDOS */
 
-      sout = dup( 1 );
-      close( 1 );
-      dup( fileno( conf->fp ) );
-      if( 0 > spawnlp( 0, filter, filter, conf->file, NULL ) )
-	FatalErrorOccurred();
-      close( 1 );
-      dup( sout );
-      rewind( conf->fp );
+#ifdef WINDOWS
+    int sout;
 
-      return TRUE;
-    }
+    /*
+     * zcat
+     */
+    tmpf = tempnam( NULL, "lv" );
+    if( !tmpf || NULL == (conf->fp = fopen( tmpf, "wb+" )) )
+      perror( "temporary file" ), exit( -1 );
+
+    sout = dup( 1 );
+    close( 1 );
+    dup( fileno( conf->fp ) );
+    if( 0 > spawnlp( 0, filter, filter, conf->file, NULL ) )
+      FatalErrorOccurred();
+    close( 1 );
+    dup( sout );
+    rewind( conf->fp );
+    return TRUE;
 #endif /* MSDOS,WINDOWS */
 
 #ifdef UNIX
-    { int fds[ 2 ], pid;
+    int fds[ 2 ], pid;
 
-      if( 0 > pipe( fds ) )
-	perror( "pipe" ), exit( -1 );
+    /*
+     * zcat
+     */
+    if( NULL == (conf->fp = (FILE *)tmpfile()) )
+      perror( "temporary file" ), exit( -1 );
 
-      switch( pid = fork() ){
-      case -1:
-	perror( "fork" ), exit( -1 );
-      case 0:
-	/*
-	 * child process
-	 */
-	close( fds[ 0 ] );
-	close( 1 );
-	dup( fds[ 1 ] );
-	if( 0 > execlp( filter, filter, conf->file, NULL ) )
-	  perror( "zcat" ), exit( -1 );
-	/*
-	 * never reach here
-	 */
+    if( 0 > pipe( fds ) )
+      perror( "pipe" ), exit( -1 );
+
+    switch( pid = fork() ){
+    case -1:
+      perror( "fork" ), exit( -1 );
+    case 0:
+      /*
+       * child process
+       */
+      close( fds[ 0 ] );
+      close( 1 );
+      dup( fds[ 1 ] );
+      if( 0 > execlp( filter, filter, conf->file, NULL ) )
+        perror( "zcat" ), exit( -1 );
+      /*
+       * never reach here
+       */
       default:
-	/*
-	 * parent process
-	 */
-	close( fds[ 1 ] );
-	if( NULL == (conf->sp = fdopen( fds[ 0 ], "r" )) )
-	  StdinDuplicationFailed();
+      /*
+       * parent process
+       */
+      close( fds[ 1 ] );
+      if( NULL == (conf->sp = fdopen( fds[ 0 ], "r" )) )
+        StdinDuplicationFailed();
 
-	return TRUE;
-      }
+      return TRUE;
     }
 #endif /* UNIX */
   }
@@ -477,13 +505,23 @@ private boolean_t LvReconnect( conf_t *conf )
     dup( 1 );
 #endif /* MSDOS */
 #ifdef WINDOWS
+    struct stat sbuf;
+
     conf->file = "(stdin)";
-    if( NULL == (conf->fp = (FILE *)tmpfile()) )
-      perror( "temporary file" ), exit( -1 );
-    if( NULL == (conf->sp = fdopen( dup( fileno(stdin) ), "rb" )) )
-      StdinDuplicationFailed();
-    close( fileno(stdin) );
-    dup( fileno(stdout) );
+    fstat( 0, &sbuf );
+    if( S_IFREG == ( sbuf.st_mode & S_IFMT ) ){
+      /* regular */
+      if( NULL == (conf->fp = fdopen( dup( 0 ), "r" )) )
+	StdinDuplicationFailed();
+    } else {
+      /* socket */
+      tmpf = tempnam( NULL, "lv" );
+      if( !tmpf || NULL == (conf->fp = fopen( tmpf, "wb+" )) )
+        perror( "temporary file" ), exit( -1 );
+      if( NULL == (conf->sp = fdopen( dup( 0 ), "r" )) )
+	StdinDuplicationFailed();
+    }
+    close( 0 );
 #endif /* WINDOWS */
 #ifdef UNIX
     struct stat sbuf;
@@ -563,6 +601,10 @@ public int main( int argc, char **argv )
 		 conf->keyboardCodingSystem );
     Conv( f );
   }
+
+#ifdef WINDOWS
+  if( tmpf ) unlink( tmpf );
+#endif
 
   return 0;
 }
