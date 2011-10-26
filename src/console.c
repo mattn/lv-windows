@@ -204,7 +204,7 @@ public void ConsoleGetWindowSize()
 #ifdef WINDOWS
   CONSOLE_SCREEN_BUFFER_INFO csbi;
   SMALL_RECT rect;
-  GetConsoleScreenBufferInfo(console_handle, &csbi);
+  GetConsoleScreenBufferInfo( console_handle, &csbi );
   WIDTH = csbi.dwSize.X;
   HEIGHT = csbi.dwSize.Y - 1;
 #endif
@@ -260,8 +260,8 @@ public void ConsoleTermInit()
 
 #ifdef WINDOWS
   CONSOLE_SCREEN_BUFFER_INFO csbi;
-  stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
-  GetConsoleScreenBufferInfo(stdout_handle, &csbi);
+  stdout_handle = GetStdHandle( STD_OUTPUT_HANDLE );
+  GetConsoleScreenBufferInfo( stdout_handle, &csbi );
   SMALL_RECT rect;
   rect = csbi.srWindow;
   WIDTH = rect.Right - rect.Left;
@@ -344,20 +344,21 @@ public void ConsoleSetUp()
   COORD coord;
   DWORD mode, written;
   console_handle = CreateConsoleScreenBuffer(
-		  GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
-  GetConsoleScreenBufferInfo(console_handle, &csbi);
+		  GENERIC_READ | GENERIC_WRITE, 0, NULL,
+		  CONSOLE_TEXTMODE_BUFFER, NULL );
+  GetConsoleScreenBufferInfo( console_handle, &csbi );
   initial_attr = current_attr = csbi.wAttributes;
   rect = csbi.srWindow;
   coord.X = rect.Right - rect.Left;
   coord.Y = rect.Bottom - rect.Top;
-  SetConsoleScreenBufferSize(console_handle, coord);
-  GetConsoleMode(GetStdHandle(STD_INPUT_HANDLE), &initial_mode);
+  SetConsoleScreenBufferSize( console_handle, coord );
+  GetConsoleMode( GetStdHandle( STD_INPUT_HANDLE ), &initial_mode );
   mode = initial_mode;
   mode &= ~ENABLE_LINE_INPUT;
   mode &= ~ENABLE_ECHO_INPUT;
   mode &= ~ENABLE_PROCESSED_INPUT;
-  SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE), mode);
-  SetConsoleActiveScreenBuffer(console_handle);
+  SetConsoleMode( GetStdHandle( STD_INPUT_HANDLE ), mode );
+  SetConsoleActiveScreenBuffer( console_handle );
 #endif
 
 #ifdef UNIX
@@ -414,8 +415,8 @@ public void ConsoleSetDown()
 #endif /* MSDOS */
 
 #ifdef WINDOWS
-  CloseHandle(console_handle);
-  SetConsoleMode(GetStdHandle(STD_INPUT_HANDLE), initial_mode);
+  CloseHandle( console_handle );
+  SetConsoleMode( GetStdHandle( STD_INPUT_HANDLE ), initial_mode );
 #endif /* WINDOWS */
 
 #ifdef UNIX
@@ -539,7 +540,7 @@ public int ConsolePrint( char c )
 
 #ifdef WINDOWS
   DWORD written;
-  WriteFile(console_handle, &c, 1, &written, NULL);
+  WriteFile( console_handle, &c, 1, &written, NULL );
 #endif /* WINDOWS */
 
 #ifdef UNIX
@@ -597,9 +598,9 @@ public void ConsoleSetCur( int x, int y )
 
 #ifdef WINDOWS
   COORD coord;
-  if (x != -1) coord.X = x;
-  if (y != -1) coord.Y = y;
-  SetConsoleCursorPosition(console_handle, coord);
+  if( x != -1 ) coord.X = x;
+  if( y != -1 ) coord.Y = y;
+  SetConsoleCursorPosition( console_handle, coord );
 #endif /* WINDOWS */
 
 #ifdef TERMCAP
@@ -620,9 +621,9 @@ public void ConsoleOnCur()
 
 #ifdef WINDOWS
   CONSOLE_CURSOR_INFO cci;
-  GetConsoleCursorInfo(console_handle, &cci);
+  GetConsoleCursorInfo( console_handle, &cci );
   cci.bVisible = TRUE;
-  SetConsoleCursorInfo(console_handle, &cci);
+  SetConsoleCursorInfo( console_handle, &cci );
 #endif /* WINDOWS */
 
 #ifdef UNIX
@@ -640,9 +641,9 @@ public void ConsoleOffCur()
 
 #ifdef WINDOWS
   CONSOLE_CURSOR_INFO cci;
-  GetConsoleCursorInfo(console_handle, &cci);
+  GetConsoleCursorInfo( console_handle, &cci );
   cci.bVisible = FALSE;
-  SetConsoleCursorInfo(console_handle, &cci);
+  SetConsoleCursorInfo( console_handle, &cci );
 #endif /* WINDOWS */
 
 #ifdef UNIX
@@ -661,13 +662,13 @@ public void ConsoleClearRight()
   CONSOLE_SCREEN_BUFFER_INFO csbi;
   COORD coord;
   DWORD size, written;
-  GetConsoleScreenBufferInfo(console_handle, &csbi);
+  GetConsoleScreenBufferInfo( console_handle, &csbi );
   coord = csbi.dwCursorPosition;
   size = csbi.dwSize.X - coord.X;
-  FillConsoleOutputCharacter(console_handle, ' ', size, coord, &written);
-  FillConsoleOutputAttribute(console_handle,
-    csbi.wAttributes, size, coord, &written);
-  SetConsoleCursorPosition(console_handle, csbi.dwCursorPosition);
+  FillConsoleOutputCharacter( console_handle, ' ', size, coord, &written );
+  FillConsoleOutputAttribute( console_handle,
+    csbi.wAttributes, size, coord, &written );
+  SetConsoleCursorPosition( console_handle, csbi.dwCursorPosition );
 #endif /* WINDOWS */
 
 #ifdef UNIX
@@ -684,9 +685,9 @@ public void ConsoleGoAhead()
 #ifdef WINDOWS
   CONSOLE_SCREEN_BUFFER_INFO csbi;
   COORD coord;
-  GetConsoleScreenBufferInfo(console_handle, &csbi);
+  GetConsoleScreenBufferInfo( console_handle, &csbi );
   csbi.dwCursorPosition.X = 0;
-  SetConsoleCursorPosition(console_handle, csbi.dwCursorPosition);
+  SetConsoleCursorPosition( console_handle, csbi.dwCursorPosition );
 #endif /* WINDOWS */
 
 #ifdef UNIX
@@ -706,7 +707,7 @@ public void ConsoleScrollUp()
   SMALL_RECT rect;
   CHAR_INFO ci;
   COORD coord;
-  GetConsoleScreenBufferInfo(console_handle, &csbi);
+  GetConsoleScreenBufferInfo( console_handle, &csbi );
   rect.Top = csbi.dwCursorPosition.Y;
   rect.Bottom = csbi.srWindow.Bottom - 1;
   rect.Left = 0;
@@ -715,8 +716,8 @@ public void ConsoleScrollUp()
   coord.Y = rect.Top - 1;
   ci.Char.AsciiChar = ' ';
   ci.Attributes = csbi.wAttributes;
-  ScrollConsoleScreenBuffer(console_handle, &rect, &rect, coord, &ci);
-  SetConsoleCursorPosition(console_handle, csbi.dwCursorPosition);
+  ScrollConsoleScreenBuffer( console_handle, &rect, &rect, coord, &ci );
+  SetConsoleCursorPosition( console_handle, csbi.dwCursorPosition );
 #endif /* WINDOWS */
 
 #ifdef UNIX
@@ -737,7 +738,7 @@ public void ConsoleScrollDown()
   SMALL_RECT rect;
   CHAR_INFO ci;
   COORD coord;
-  GetConsoleScreenBufferInfo(console_handle, &csbi);
+  GetConsoleScreenBufferInfo( console_handle, &csbi );
   rect.Top = csbi.dwCursorPosition.Y;
   rect.Bottom = csbi.srWindow.Bottom - 1;
   rect.Left = 0;
@@ -746,8 +747,8 @@ public void ConsoleScrollDown()
   coord.Y = rect.Top + 1;
   ci.Char.AsciiChar = ' ';
   ci.Attributes = csbi.wAttributes;
-  ScrollConsoleScreenBuffer(console_handle, &rect, &rect, coord, &ci);
-  SetConsoleCursorPosition(console_handle, csbi.dwCursorPosition);
+  ScrollConsoleScreenBuffer( console_handle, &rect, &rect, coord, &ci );
+  SetConsoleCursorPosition( console_handle, csbi.dwCursorPosition );
 #endif /* WINDOWS */
 
 #ifdef UNIX
@@ -818,7 +819,7 @@ public void ConsoleSetAttribute( char attr )
 	current_attr |= FOREGROUND_GREEN;
     if( ATTR_STANDOUT & attr )
 	current_attr |= BACKGROUND_INTENSITY;
-    SetConsoleTextAttribute(console_handle, current_attr);
+    SetConsoleTextAttribute( console_handle, current_attr );
   }
   prevAttr = attr;
 #else
