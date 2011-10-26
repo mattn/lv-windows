@@ -182,9 +182,6 @@ public boolean_t IsAtty( int fd )
   else
     return FALSE;
 #endif /* MSDOS */
-#ifdef WINDOWS
-  return TRUE;
-#endif
 }
 
 public char *Exts( char *s )
