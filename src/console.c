@@ -15,6 +15,25 @@
 
 #ifdef WINDOWS
 #include <windows.h>
+
+#ifndef FOREGROUND_WHITE
+#define FOREGROUND_WHITE (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE)
+#endif
+#ifndef BACKGROUND_WHITE
+#define BACKGROUND_WHITE (BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE)
+#endif
+#ifndef FOREGROUND_BLACK
+#define FOREGROUND_BLACK	FOREGROUND_INTENSITY
+#endif
+#ifndef BACKGROUND_BLACK
+#define BACKGROUND_BLACK	BACKGROUND_INTENSITY
+#endif
+#ifndef FOREGROUND_MASK
+#define FOREGROUND_MASK (FOREGROUND_RED|FOREGROUND_BLUE|FOREGROUND_GREEN|FOREGROUND_INTENSITY)
+#endif
+#ifndef BACKGROUND_MASK
+#define BACKGROUND_MASK (BACKGROUND_RED|BACKGROUND_BLUE|BACKGROUND_GREEN|BACKGROUND_INTENSITY)
+#endif
 #endif
 
 #ifdef UNIX
@@ -59,8 +78,7 @@ private char *cursor_invisible		= NULL;
 #endif /* MSDOS */
 
 #ifdef WINDOWS
-private WORD initial_attr = 0;
-private WORD current_attr = 0;
+private WORD console_attr = 0;
 private HANDLE stdout_handle = NULL;
 private HANDLE console_handle = NULL;
 private DWORD initial_mode;
@@ -347,7 +365,7 @@ public void ConsoleSetUp()
 		  GENERIC_READ | GENERIC_WRITE, 0, NULL,
 		  CONSOLE_TEXTMODE_BUFFER, NULL );
   GetConsoleScreenBufferInfo( console_handle, &csbi );
-  initial_attr = current_attr = csbi.wAttributes;
+  console_attr = csbi.wAttributes;
   rect = csbi.srWindow;
   coord.X = rect.Right - rect.Left;
   coord.Y = rect.Bottom - rect.Top;
@@ -806,20 +824,48 @@ public void ConsoleSetAttribute( char attr )
     /*
      * non ansi sequence
      */
-    if( ( ATTR_HILIGHT & prevAttr ) && 0 == ( ATTR_HILIGHT & attr ) ) {
-	current_attr &= ~FOREGROUND_INTENSITY;
+    WORD attr_new = FOREGROUND_WHITE;
+    if( ATTR_STANDOUT & attr ){
+      attr_new =
+	((attr_new & FOREGROUND_MASK) << 4) |
+	((attr_new & BACKGROUND_MASK) >> 4);
+    } else if( ATTR_COLOR & attr ){
+      if( ATTR_REVERSE & attr ){
+	if( ATTR_COLOR_B & attr ){
+	  attr_new = (attr_new & BACKGROUND_MASK)
+	    | FOREGROUND_INTENSITY;
+		;
+	  if((ATTR_COLOR & attr) & 1) attr_new |= BACKGROUND_RED;
+	  if((ATTR_COLOR & attr) & 2) attr_new |= BACKGROUND_GREEN;
+	  if((ATTR_COLOR & attr) & 4) attr_new |= BACKGROUND_BLUE;
+	} else {
+	  attr_new = (attr_new & BACKGROUND_MASK)
+	    | FOREGROUND_INTENSITY | FOREGROUND_WHITE;
+	  if((ATTR_COLOR & attr) & 1) attr_new |= BACKGROUND_RED;
+	  if((ATTR_COLOR & attr) & 2) attr_new |= BACKGROUND_GREEN;
+	  if((ATTR_COLOR & attr) & 4) attr_new |= BACKGROUND_BLUE;
+	}
+      } else {
+	  attr_new = (attr_new & BACKGROUND_MASK);
+	  if((ATTR_COLOR & attr) & 1) attr_new |= FOREGROUND_RED;
+	  if((ATTR_COLOR & attr) & 2) attr_new |= FOREGROUND_GREEN;
+	  if((ATTR_COLOR & attr) & 4) attr_new |= FOREGROUND_BLUE;
+      }
+    } else if( ATTR_REVERSE & attr ){
+      attr_new =
+	((attr_new & FOREGROUND_MASK) << 4) |
+	((attr_new & BACKGROUND_MASK) >> 4);
     }
-    if( ( ATTR_UNDERLINE & prevAttr ) && 0 == ( ATTR_UNDERLINE & attr ) )
-	current_attr &= ~FOREGROUND_GREEN;
-    if( ( ATTR_STANDOUT & prevAttr ) && 0 == ( ATTR_STANDOUT & attr ) )
-	current_attr &= ~BACKGROUND_INTENSITY;
-    if( ATTR_HILIGHT & attr )
-	current_attr |= FOREGROUND_INTENSITY;
-    if( ATTR_UNDERLINE & attr )
-	current_attr |= FOREGROUND_GREEN;
-    if( ATTR_STANDOUT & attr )
-	current_attr |= BACKGROUND_INTENSITY;
-    SetConsoleTextAttribute( console_handle, current_attr );
+    if( ATTR_BLINK & attr ){
+      attr_new |= FOREGROUND_INTENSITY;
+    }
+    if( ATTR_UNDERLINE & attr ){
+      attr_new |= FOREGROUND_INTENSITY;
+    }
+    if( ATTR_HILIGHT & attr ){
+      attr_new |= FOREGROUND_INTENSITY;
+    }
+    SetConsoleTextAttribute( console_handle, attr_new );
   }
   prevAttr = attr;
 #else
