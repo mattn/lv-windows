@@ -42,6 +42,9 @@
 #include <sys/ioctl.h>
 #else
 #include <termios.h>
+#ifdef __linux__
+#include <pty.h>
+#endif /* __linux__ */
 #endif /* OLDBSD */
 #endif /* UNIX */
 
