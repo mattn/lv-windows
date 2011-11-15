@@ -365,8 +365,8 @@ public void ConsoleSetUp()
   COORD coord;
   DWORD mode, written;
   console_handle = CreateConsoleScreenBuffer(
-		  GENERIC_READ | GENERIC_WRITE, 0, NULL,
-		  CONSOLE_TEXTMODE_BUFFER, NULL );
+		  GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+		  NULL, CONSOLE_TEXTMODE_BUFFER, NULL );
   GetConsoleScreenBufferInfo( console_handle, &csbi );
   console_attr = csbi.wAttributes;
   rect = csbi.srWindow;
