@@ -603,10 +603,8 @@ public int main( int argc, char **argv )
   }
 
 #ifdef WINDOWS
-  if( tmpf ){
-    if( NULL != conf->fp ) fclose( conf->fp );
-    unlink( tmpf );
-  }
+  if( NULL != conf->fp ) fclose( conf->fp );
+  if( tmpf ) unlink( tmpf );
 #endif
 
   return 0;
