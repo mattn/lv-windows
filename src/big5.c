@@ -1,8 +1,26 @@
 /*
  * big5.c
  *
- * All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+ * All rights reserved. Copyright (C) 1996 by NARITA Tomio.
+ * $Id: big5.c,v 1.6 2004/01/05 07:23:29 nrt Exp $
  */
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
+#include <stdio.h>
 
 #include <import.h>
 #include <decode.h>
@@ -13,84 +31,7 @@
 #include <begin.h>
 #include <big5.h>
 
-private codes_t big5Level1ToCnsPlane1[ 25 ] = {	/* range */
-  { 0xA140, 0x2121 },
-  { 0xA1F6, 0x2258 },
-  { 0xA1F7, 0x2257 },
-  { 0xA1F8, 0x2259 },
-  { 0xA2AF, 0x2421 },
-  { 0xA3C0, 0x4221 },
-  { 0xa3e1, 0x0000 },
-  { 0xA440, 0x4421 },
-  { 0xACFE, 0x5753 },
-  { 0xacff, 0x0000 },
-  { 0xAD40, 0x5323 },
-  { 0xAFD0, 0x5754 },
-  { 0xBBC8, 0x6B51 },
-  { 0xBE52, 0x6B50 },
-  { 0xBE53, 0x6F5C },
-  { 0xC1AB, 0x7536 },
-  { 0xC2CB, 0x7535 },
-  { 0xC2CC, 0x7737 },
-  { 0xC361, 0x782E },
-  { 0xC3B9, 0x7865 },
-  { 0xC3BA, 0x7864 },
-  { 0xC3BB, 0x7866 },
-  { 0xC456, 0x782D },
-  { 0xC457, 0x7962 },
-  { 0xc67f, 0x0000 }
-};
-
-private codes_t big5Level2ToCnsPlane2[ 48 ] = {	/* range */
-  { 0xC940, 0x2121 },
-  { 0xc94a, 0x0000 },
-  { 0xC94B, 0x212B },
-  { 0xC96C, 0x214D },
-  { 0xC9BE, 0x214C },
-  { 0xC9BF, 0x217D },
-  { 0xC9ED, 0x224E },
-  { 0xCAF7, 0x224D },
-  { 0xCAF8, 0x2439 },
-  { 0xD77A, 0x3F6A },
-  { 0xD77B, 0x387E },
-  { 0xDBA7, 0x3F6B },
-  { 0xDDFC, 0x4176 },
-  { 0xDDFD, 0x4424 },
-  { 0xE8A3, 0x554C },
-  { 0xE976, 0x5723 },
-  { 0xEB5B, 0x5A29 },
-  { 0xEBF1, 0x554B },
-  { 0xEBF2, 0x5B3F },
-  { 0xECDE, 0x5722 },
-  { 0xECDF, 0x5C6A },
-  { 0xEDAA, 0x5D75 },
-  { 0xEEEB, 0x642F },
-  { 0xEEEC, 0x6039 },
-  { 0xF056, 0x5D74 },
-  { 0xF057, 0x6243 },
-  { 0xF0CB, 0x5A28 },
-  { 0xF0CC, 0x6337 },
-  { 0xF163, 0x6430 },
-  { 0xF16B, 0x6761 },
-  { 0xF16C, 0x6438 },
-  { 0xF268, 0x6934 },
-  { 0xF269, 0x6573 },
-  { 0xF2C3, 0x664E },
-  { 0xF375, 0x6762 },
-  { 0xF466, 0x6935 },
-  { 0xF4B5, 0x664D },
-  { 0xF4B6, 0x6962 },
-  { 0xF4FD, 0x6A4C },
-  { 0xF663, 0x6A4B },
-  { 0xF664, 0x6C52 },
-  { 0xF977, 0x7167 },
-  { 0xF9C4, 0x7166 },
-  { 0xF9C5, 0x7234 },
-  { 0xF9C6, 0x7240 },
-  { 0xF9C7, 0x7235 },
-  { 0xF9D2, 0x7241 },
-  { 0xf9d6, 0x0000 }
-};
+#include <big5cns.map>
 
 private ic_t BinarySearchRange( codes_t *array, int high, ic_t code )
 {
@@ -162,7 +103,7 @@ private ic_t BinarySearchRange( codes_t *array, int high, ic_t code )
   return 0;
 }
 
-public ic_t BIG5toCNS( ic_t big5, char *cset )
+public ic_t BIG5toCNS( ic_t big5, byte *cset )
 {
   ic_t cns = 0;
 
@@ -188,88 +129,7 @@ public ic_t BIG5toCNS( ic_t big5, char *cset )
   return cns;
 }
 
-private codes_t cnsPlane1ToBig5Level1[ 26 ] = {	/* range */
-  { 0x2121, 0xA140 },
-  { 0x2257, 0xA1F7 },
-  { 0x2258, 0xA1F6 },
-  { 0x2259, 0xA1F8 },
-  { 0x234f, 0x0000 },
-  { 0x2421, 0xA2AF },
-  { 0x2571, 0x0000 },
-  { 0x4221, 0xA3C0 },
-  { 0x4242, 0x0000 },
-  { 0x4421, 0xA440 },
-  { 0x5323, 0xAD40 },
-  { 0x5753, 0xACFE },
-  { 0x5754, 0xAFD0 },
-  { 0x6B50, 0xBE52 },
-  { 0x6B51, 0xBBC8 },
-  { 0x6F5C, 0xBE53 },
-  { 0x7535, 0xC2CB },
-  { 0x7536, 0xC1AB },
-  { 0x7737, 0xC2CC },
-  { 0x782D, 0xC456 },
-  { 0x782E, 0xC361 },
-  { 0x7864, 0xC3BA },
-  { 0x7865, 0xC3B9 },
-  { 0x7866, 0xC3BB },
-  { 0x7962, 0xC457 },
-  { 0x7d4c, 0x0000 }
-};
-
-private codes_t cnsPlane2ToBig5Level2[ 49 ] = {	/* range */
-  { 0x2121, 0xC940 },
-  { 0x212B, 0xC94B },
-  { 0x214C, 0xC9BE },
-  { 0x214D, 0xC96C },
-  { 0x217D, 0xC9BF },
-  { 0x224D, 0xCAF7 },
-  { 0x224E, 0xC9ED },
-  { 0x2439, 0xCAF8 },
-  { 0x387E, 0xD77B },
-  { 0x3F6A, 0xD77A },
-  { 0x3F6B, 0xDBA7 },
-  { 0x4424, 0x0000 },
-  { 0x4176, 0xDDFC },
-  { 0x4177, 0x0000 },
-  { 0x4424, 0xDDFD },
-  { 0x554B, 0xEBF1 },
-  { 0x554C, 0xE8A3 },
-  { 0x5722, 0xECDE },
-  { 0x5723, 0xE976 },
-  { 0x5A28, 0xF0CB },
-  { 0x5A29, 0xEB5B },
-  { 0x5B3F, 0xEBF2 },
-  { 0x5C6A, 0xECDF },
-  { 0x5D74, 0xF056 },
-  { 0x5D75, 0xEDAA },
-  { 0x6039, 0xEEEC },
-  { 0x6243, 0xF057 },
-  { 0x6337, 0xF0CC },
-  { 0x642F, 0xEEEB },
-  { 0x6430, 0xF163 },
-  { 0x6438, 0xF16C },
-  { 0x6573, 0xF269 },
-  { 0x664D, 0xF4B5 },
-  { 0x664E, 0xF2C3 },
-  { 0x6761, 0xF16B },
-  { 0x6762, 0xF375 },
-  { 0x6934, 0xF268 },
-  { 0x6935, 0xF466 },
-  { 0x6962, 0xF4B6 },
-  { 0x6A4B, 0xF663 },
-  { 0x6A4C, 0xF4FD },
-  { 0x6C52, 0xF664 },
-  { 0x7166, 0xF9C4 },
-  { 0x7167, 0xF977 },
-  { 0x7234, 0xF9C5 },
-  { 0x7235, 0xF9C7 },
-  { 0x7240, 0xF9C6 },
-  { 0x7241, 0xF9D2 },
-  { 0x7245, 0x0000 }
-};
-
-public ic_t CNStoBIG5( ic_t cns, char *cset )
+public ic_t CNStoBIG5( ic_t cns, byte *cset )
 {
   unsigned int big5 = 0;
 
@@ -292,23 +152,43 @@ public ic_t CNStoBIG5( ic_t cns, char *cset )
   return big5;
 }
 
-#define IsBig5Byte1( c )						\
-  ( ( (c) >= 0xa1 && (c) <= 0xfe ) )
-
-#define IsBig5Byte2( c )						\
-  ( ( (c) >= 0x40 && (c) <= 0x7e ) || ( (c) >= 0xa1 && (c) <= 0xfe ) )
-
-public void DecodeBig5( state_t *state, char codingSystem )
+public void ConvertCNStoBIG5( i_str_t *istr )
 {
-  char charset, ch;
-  char c[ ICHAR_WIDTH ];
+  int i;
+  byte cset;
+
+  for( i = 0 ; NOSET != istr[ i ].charset ; i++ ){
+    if( CNS_1 == istr[ i ].charset || CNS_2 == istr[ i ].charset ){
+      cset = istr[ i ].charset;
+      istr[ i ].c = CNStoBIG5( istr[ i ].c, &cset );
+      istr[ i ].charset = cset;
+    }
+  }
+}
+
+public void ConvertBIG5toCNS( i_str_t *istr )
+{
+  int i;
+  byte cset;
+
+  for( i = 0 ; NOSET != istr[ i ].charset ; i++ ){
+    if( BIG5 == istr[ i ].charset ){
+      cset = istr[ i ].charset;
+      istr[ i ].c = BIG5toCNS( istr[ i ].c, &cset );
+      istr[ i ].charset = cset;
+    }
+  }
+}
+
+public void DecodeBig5( state_t *state, byte codingSystem )
+{
+  byte charset, ch;
+  byte c[ ICHAR_WIDTH ];
 
   for( ; ; ){
     GetChar( ch );
     if( ch < SP ){
-      if( CR == ch )
-	continue;
-      else if( ESC == ch ){
+      if( ESC == ch ){
 	if( FALSE == DecodeEscape( state ) )
 	  break;
       } else if( HT == ch )
@@ -322,7 +202,7 @@ public void DecodeBig5( state_t *state, char codingSystem )
       else
 	DecodeAddControl( ch );
     } else {
-      if( NULL != state->sset ){
+      if( 0 != state->sset ){
 	if( FALSE == DecodeAddShifted( state, ch ) )
 	  break;
 	else
@@ -368,11 +248,11 @@ public void DecodeBig5( state_t *state, char codingSystem )
 }
 
 public void EncodeBig5( i_str_t *istr, int head, int tail,
-		       char codingSystem, boolean_t binary )
+		       byte codingSystem, boolean_t binary )
 {
   int idx, attr;
   ic_t ic;
-  char cset;
+  byte cset;
 
   for( idx = head ; idx < tail ; idx++ ){
     cset = istr[ idx ].charset;

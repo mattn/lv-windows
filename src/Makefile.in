@@ -1,0 +1,327 @@
+########################################################################
+# Makefile for lv
+#   target: all, clean, install, uninstall, dist
+########################################################################
+
+@SET_MAKE@
+VERSION= 451
+
+srcdir=	@srcdir@
+VPATH=	@srcdir@
+
+prefix=	@prefix@
+exec_prefix=	@exec_prefix@
+bindir=	@bindir@
+libdir=	@libdir@
+mandir=	@mandir@
+
+lvlibdir=	$(libdir)/lv
+distdir = lv$(VERSION)
+
+PURIFY=	@PURIFY@
+CC=	@CC@
+CFLAGS=	@CFLAGS@ -DLV_HELP_PATH=\"$(lvlibdir)\" -I$(srcdir) @DEFS@
+LIBS=	@LIBS@
+LDFLAGS=@LDFLAGS@
+INSTALL=@INSTALL@
+PERL=	@PERL@
+
+OBJS=	itable.o ctable.o uty.o istr.o stream.o file.o guess.o decode.o \
+	encode.o escape.o iso2022.o iso8859.o iso2cn.o iso2jp.o iso2kr.o \
+	kana.o eucjapan.o shiftjis.o big5.o hz.o raw.o \
+	fetch.o screen.o command.o display.o find.o re.o \
+	nfa.o dfa.o conv.o version.o conf.o lv.o console.o guesslocale.o
+UNIOBJS=	utf.o unimap.o unirev.o
+
+
+#
+# Building lv
+#
+
+all:	lv
+
+lv:	$(OBJS) $(UNIOBJS)
+	$(PURIFY) $(CC) $(LDFLAGS) -o $@ $(OBJS) $(UNIOBJS) $(LIBS)
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<
+
+#
+# Cleaning
+#
+
+clean::
+	/bin/rm -f *.o lv
+
+distclean::	clean
+	/bin/rm -f Makefile config.log config.status config.cache
+
+depend::
+	mkdep ${CFLAGS:M-[ID]*} $(srcdir)/*.c
+
+#
+# Installation
+#
+
+install::
+	$(INSTALL) -s -m 555 lv $(bindir)
+	if test -f $(bindir)/lgrep; then \
+		/bin/rm -f $(bindir)/lgrep; \
+	fi
+	(cd $(bindir); ln lv lgrep)
+	if test ! -d $(lvlibdir); then \
+		mkdir -p $(lvlibdir); \
+	fi
+	$(INSTALL) -m 444 $(srcdir)/../lv.hlp $(lvlibdir)
+	if test -d $(mandir) -a -d $(mandir)/man1; then \
+		$(INSTALL) -m 444 $(srcdir)/../lv.1 $(mandir)/man1; \
+	fi
+
+uninstall::
+	for i in $(bindir)/lv $(bindir)/lgrep $(lvlibdir)/lv.hlp $(mandir)/man1/lv.1; do \
+		if test -f $$i; then /bin/rm -f $$i; \
+	done
+
+#------------------------------------------------------------
+# the following rules are just for maintainer
+
+dist::
+	if [ -f ../$(distdir).tar.gz ]; then rm ../$(distdir).tar.gz ; fi
+	cd ../.. ; \
+	tar cvf $(distdir)/$(distdir).tar \
+		$(distdir)/README $(distdir)/GPL.txt \
+		$(distdir)/index.html $(distdir)/relnote.html \
+		$(distdir)/lv.1 $(distdir)/lv.hlp \
+		$(distdir)/hello.sample $(distdir)/hello.sample.gif \
+		$(distdir)/build/README \
+		$(distdir)/src/configure $(distdir)/src/configure.in \
+		$(distdir)/src/install-sh \
+		$(distdir)/src/config.sub $(distdir)/src/config.guess \
+		$(distdir)/src/Makefile.in $(distdir)/src/Makefile.dos \
+		$(distdir)/src/*.h $(distdir)/src/*.c \
+		$(distdir)/src/*.map $(distdir)/src/*.rev \
+		$(distdir)/src/*.pl $(distdir)/src/*.sh
+	gzip ../$(distdir).tar
+
+#
+# big5-cns map files
+#
+
+big5cns.map: cjk.inf.gz
+	$(PERL) $(srcdir)/big5cns.pl > $@
+
+CJKINFURL = ftp://ftp.ora.com/pub/examples/nutshell/ujip/doc/
+
+cjk.inf.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(CJKINFURL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+
+#
+# map files
+#
+
+map: big5.map gb2312.map jis.map ksc5601.map iso88592.map iso88593.map iso88594.map iso88595.map iso88596.map iso88597.map iso88598.map iso88599.map iso885910.map iso885911.map iso885913.map iso885914.map iso885915.map iso885916.map
+
+big5.map: BIG5.TXT.gz
+	$(PERL) $(srcdir)/mapbig5.pl > $@
+
+gb2312.map: GB2312.TXT.gz
+	$(PERL) $(srcdir)/mapgb.pl > $@
+
+jis.map: JIS0208.TXT.gz JIS0212.TXT.gz
+	$(PERL) $(srcdir)/mapjis.pl > $@
+
+ksc5601.map: KSX1001.TXT.gz
+	$(PERL) $(srcdir)/mapksc.pl > $@
+
+iso88592.map: 8859-2.TXT.gz
+	$(PERL) $(srcdir)/map8859.pl -s 2 -i 'zcat 8859-2.TXT.gz |' > $@
+
+iso88593.map: 8859-3.TXT.gz
+	$(PERL) $(srcdir)/map8859.pl -s 3 -i 'zcat 8859-3.TXT.gz |' > $@
+
+iso88594.map: 8859-4.TXT.gz
+	$(PERL) $(srcdir)/map8859.pl -s 4 -i 'zcat 8859-4.TXT.gz |' > $@
+
+iso88595.map: 8859-5.TXT.gz
+	$(PERL) $(srcdir)/map8859.pl -s 5 -i 'zcat 8859-5.TXT.gz |' > $@
+
+iso88596.map: 8859-6.TXT.gz
+	$(PERL) $(srcdir)/map8859.pl -s 6 -i 'zcat 8859-6.TXT.gz |' > $@
+
+iso88597.map: 8859-7.TXT.gz
+	$(PERL) $(srcdir)/map8859.pl -s 7 -i 'zcat 8859-7.TXT.gz |' > $@
+
+iso88598.map: 8859-8.TXT.gz
+	$(PERL) $(srcdir)/map8859.pl -s 8 -i 'zcat 8859-8.TXT.gz |' > $@
+
+iso88599.map: 8859-9.TXT.gz
+	$(PERL) $(srcdir)/map8859.pl -s 9 -i 'zcat 8859-9.TXT.gz |' > $@
+
+iso885910.map: 8859-10.TXT.gz
+	$(PERL) $(srcdir)/map8859.pl -s 10 -i 'zcat 8859-10.TXT.gz |' > $@
+
+iso885911.map: 8859-11.TXT.gz
+	$(PERL) $(srcdir)/map8859.pl -s 11 -i 'zcat 8859-11.TXT.gz |' > $@
+
+iso885913.map: 8859-13.TXT.gz
+	$(PERL) $(srcdir)/map8859.pl -s 13 -i 'zcat 8859-13.TXT.gz |' > $@
+
+iso885914.map: 8859-14.TXT.gz
+	$(PERL) $(srcdir)/map8859.pl -s 14 -i 'zcat 8859-14.TXT.gz |' > $@
+
+iso885915.map: 8859-15.TXT.gz
+	$(PERL) $(srcdir)/map8859.pl -s 15 -i 'zcat 8859-15.TXT.gz |' > $@
+
+iso885916.map: 8859-16.TXT.gz
+	$(PERL) $(srcdir)/map8859.pl -s 16 -i 'zcat 8859-16.TXT.gz |' > $@
+
+#
+# rev files
+#
+
+rev: big5.rev gb2312.rev jis0208.rev jis0212.rev ksc5601.rev iso88592.rev iso88593.rev iso88594.rev iso88595.rev iso88596.rev iso88597.rev iso88598.rev iso88599.rev iso885910.rev iso885911.rev iso885913.rev iso885914.rev iso885915.rev iso885916.rev
+
+big5.rev: BIG5.TXT.gz
+	$(PERL) $(srcdir)/revbig5.pl > $@
+
+gb2312.rev: GB2312.TXT.gz
+	$(PERL) $(srcdir)/revgb.pl > $@
+
+jis0208.rev: JIS0208.TXT.gz
+	$(PERL) $(srcdir)/rev0208.pl > $@
+
+jis0212.rev: JIS0212.TXT.gz
+	$(PERL) $(srcdir)/rev0212.pl > $@
+
+ksc5601.rev: KSX1001.TXT.gz
+	$(PERL) $(srcdir)/revksc.pl > $@
+
+iso88592.rev: 8859-2.TXT.gz
+	$(PERL) $(srcdir)/rev8859.pl -s 2 -i 'zcat 8859-2.TXT.gz |' > $@
+
+iso88593.rev: 8859-3.TXT.gz
+	$(PERL) $(srcdir)/rev8859.pl -s 3 -i 'zcat 8859-3.TXT.gz |' > $@
+
+iso88594.rev: 8859-4.TXT.gz
+	$(PERL) $(srcdir)/rev8859.pl -s 4 -i 'zcat 8859-4.TXT.gz |' > $@
+
+iso88595.rev: 8859-5.TXT.gz
+	$(PERL) $(srcdir)/rev8859.pl -s 5 -i 'zcat 8859-5.TXT.gz |' > $@
+
+iso88596.rev: 8859-6.TXT.gz
+	$(PERL) $(srcdir)/rev8859.pl -s 6 -i 'zcat 8859-6.TXT.gz |' > $@
+
+iso88597.rev: 8859-7.TXT.gz
+	$(PERL) $(srcdir)/rev8859.pl -s 7 -i 'zcat 8859-7.TXT.gz |' > $@
+
+iso88598.rev: 8859-8.TXT.gz
+	$(PERL) $(srcdir)/rev8859.pl -s 8 -i 'zcat 8859-8.TXT.gz |' > $@
+
+iso88599.rev: 8859-9.TXT.gz
+	$(PERL) $(srcdir)/rev8859.pl -s 9 -i 'zcat 8859-9.TXT.gz |' > $@
+
+iso885910.rev: 8859-10.TXT.gz
+	$(PERL) $(srcdir)/rev8859.pl -s 10 -i 'zcat 8859-10.TXT.gz |' > $@
+
+iso885911.rev: 8859-11.TXT.gz
+	$(PERL) $(srcdir)/rev8859.pl -s 11 -i 'zcat 8859-11.TXT.gz |' > $@
+
+iso885913.rev: 8859-13.TXT.gz
+	$(PERL) $(srcdir)/rev8859.pl -s 13 -i 'zcat 8859-13.TXT.gz |' > $@
+
+iso885914.rev: 8859-14.TXT.gz
+	$(PERL) $(srcdir)/rev8859.pl -s 14 -i 'zcat 8859-14.TXT.gz |' > $@
+
+iso885915.rev: 8859-15.TXT.gz
+	$(PERL) $(srcdir)/rev8859.pl -s 15 -i 'zcat 8859-15.TXT.gz |' > $@
+
+iso885916.rev: 8859-16.TXT.gz
+	$(PERL) $(srcdir)/rev8859.pl -s 16 -i 'zcat 8859-16.TXT.gz |' > $@
+
+#
+# Unicode mapping tables
+#
+
+BIG5URL = ftp://ftp.unicode.org/Public/MAPPINGS/EASTASIA/OTHER
+
+BIG5.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(BIG5URL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+
+
+GBURL = ftp://ftp.unicode.org/Public/MAPPINGS/EASTASIA/GB
+
+GB2312.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(GBURL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+
+
+JISURL = ftp://ftp.unicode.org/Public/MAPPINGS/EASTASIA/JIS
+
+JIS0201.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(JISURL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+JIS0208.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(JISURL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+JIS0212.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(JISURL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+
+
+KSCURL = ftp://ftp.unicode.org/Public/MAPPINGS/EASTASIA/KSC
+
+KSX1001.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(KSCURL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+
+
+ISO8859URL = ftp://ftp.unicode.org/Public/MAPPINGS/ISO8859
+
+8859-1.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(ISO8859URL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+8859-2.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(ISO8859URL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+8859-3.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(ISO8859URL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+8859-4.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(ISO8859URL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+8859-5.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(ISO8859URL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+8859-6.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(ISO8859URL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+8859-7.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(ISO8859URL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+8859-8.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(ISO8859URL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+8859-9.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(ISO8859URL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+8859-10.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(ISO8859URL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+8859-11.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(ISO8859URL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+8859-13.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(ISO8859URL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+8859-14.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(ISO8859URL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+8859-15.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(ISO8859URL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+8859-16.TXT.gz:
+	if [ ! -f ${@:S/.gz//} ]; then fetch -o ${@:S/.gz//} $(ISO8859URL)/${@:S/.gz//} ; fi ; \
+	if [ -f ${@:S/.gz//} ]; then gzip ${@:S/.gz//} ; fi
+

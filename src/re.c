@@ -1,7 +1,23 @@
 /*
  * re.c
  *
- * All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+ * All rights reserved. Copyright (C) 1996 by NARITA Tomio.
+ * $Id: re.c,v 1.3 2003/11/13 03:08:19 nrt Exp $
+ */
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #include <stdio.h>
@@ -12,8 +28,6 @@
 #include <find.h>
 #include <begin.h>
 #include <re.h>
-
-/*#define SHOWFUNC*/
 
 private int isIdx;
 private i_str_t *iStr;
@@ -33,7 +47,11 @@ typedef struct IC_LIST_T {
   struct IC_LIST_T *next;
 } ic_list_t;
 
-private ic_list_t *icRoot = NULL;
+private ic_list_t *icRoot = NULL;	/* full list of alphabet */
+
+/*
+ * Note that each of alphabets (and pointer to object) is unique.
+ */
 
 private i_str_t *IcAlloc( i_str_t *ic )
 {
@@ -133,10 +151,25 @@ private re_t *ReChar()
 {
   i_str_t ic;
 
+
+  LookAhead( ic );
+  if( NOSET == ic.charset ){
+    reMessage = "unexpected eol";
+    aborted = TRUE;
+    return NULL;
+  }
+
   GetChar( ic );
 
-  if( ASCII == ic.charset && ic.c == '\\' )
-    GetChar( ic );
+  if( ASCII == ic.charset && ic.c == '\\' ){
+    LookAhead( ic );
+    if( NOSET != ic.charset ){
+      GetChar( ic );
+    } else {
+      ic.charset = ASCII;
+      ic.c = '\\';
+    }
+  }
 
   if( TRUE == casefold_search && ASCII == ic.charset ){
     if( 'Z' >= ic.c && 'A' <= ic.c )
@@ -157,7 +190,6 @@ private re_t *ReCharset1()
   re_t *re, *re1, *re2;
 
   re = ReChar();
-
   if( TRUE == aborted )
     return re;
 
@@ -178,6 +210,9 @@ private re_t *ReCharset1()
     re1 = re;
     re2 = ReChar();
 
+    if( TRUE == aborted )
+      return re;
+
     if( TRUE == complement )
       re = ReAlloc( OP_COMPRANGE, &ic, re1, re2 );
     else
@@ -185,14 +220,14 @@ private re_t *ReCharset1()
 
     if( ( OP_LEAF != re1->op && OP_SIMPLE_LEAF != re1->op )
        || ( OP_LEAF != re2->op && OP_SIMPLE_LEAF != re2->op ) ){
-      aborted = TRUE;
       reMessage = "miscomposed range";
+      aborted = TRUE;
       return re;
     }
 
     if( re->left->ic->charset != re->right->ic->charset ){
-      aborted = TRUE;
       reMessage = "overcrossing range";
+      aborted = TRUE;
       return re;
     }
   } else if( TRUE == complement ){
@@ -237,13 +272,10 @@ private re_t *ReTerm()
   re_t *re;
 
   LookAhead( ic );
-
   if( NOSET == ic.charset ){
-    re = NULL;
     reMessage = "unexpected eol";
     aborted = TRUE;
-
-    return re;
+    return NULL;
   }
 
   if( ASCII == ic.charset ){
@@ -266,7 +298,6 @@ private re_t *ReTerm()
 	   * recursive exp
 	   */
 	  re = ReExp();
-
 	  if( TRUE == aborted )
 	    return re;
 
@@ -293,12 +324,11 @@ private re_t *ReTerm()
       }
 
       re = ReCharset();
+      if( TRUE == aborted )
+	return re;
 
       if( TRUE == complement )
 	complement = FALSE;
-
-      if( TRUE == aborted )
-	return re;
 
       GetChar( ic );
       if( ASCII != ic.charset || ']' != ic.c ){
@@ -322,13 +352,12 @@ private re_t *ReExp2()
   re_t *re;
 
   re = ReTerm();
-
   if( TRUE == aborted )
     return re;
 
   LookAhead( ic );
   if( ASCII == ic.charset ){
-    if( '*' == ic.c ){	
+    if( '*' == ic.c ){
       isIdx++;
       re = ReAlloc( OP_CLOSURE, NULL, re, NULL );
     } else if( '?' == ic.c ){
@@ -381,6 +410,8 @@ private re_t *ReExp1()
 	   * note: '\\' is removed
 	   */
 	  break;
+	else if( NOSET == ic.charset )
+	  break;
 	isIdx--;
       } else if( '$' == ic.c ){
 	isIdx++;
@@ -432,6 +463,18 @@ private re_t *ReRegexp()
   LookAhead( ic );
   if( ASCII == ic.charset && '^' == ic.c ){
     isIdx++;
+    LookAhead( ic );
+    if( ASCII == ic.charset && '$' == ic.c ){
+      isIdx++;
+      LookAhead( ic );
+      if( NOSET == ic.charset ){
+	return ReAlloc( OP_CAT, NULL,
+		       ReAlloc( OP_HAT, NULL, NULL, NULL ),
+		       ReAlloc( OP_DOLLAR, NULL, NULL, NULL ) );
+      } else {
+	isIdx--;
+      }
+    }
     re = ReAlloc( OP_CAT, NULL,
 		 ReAlloc( OP_HAT, NULL, NULL, NULL ),
 		 ReExp() );

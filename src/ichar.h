@@ -1,7 +1,8 @@
 /*
  * ichar.h
  *
- * All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+ * All rights reserved. Copyright (C) 1996 by NARITA Tomio
+ * $Id: ichar.h,v 1.3 2003/11/13 03:08:19 nrt Exp $
  */
 
 #ifndef __ICHAR_H__
@@ -22,13 +23,13 @@ typedef unsigned short		ic_t;
 #define HTAB_WIDTH		8
 #define HTAB_INTERNAL_WIDTH	2
 
-#define MakeByte1( ic )		( (char)( (ic) >> 8 ) )
-#define MakeByte2( ic )		( (char)( 0x00ff & (ic) ) )
+#define MakeByte1( ic )		( (byte)( (ic) >> 8 ) )
+#define MakeByte2( ic )		( (byte)( 0x00ff & (ic) ) )
 #define MakeIchar( c1, c2 )	( ( (ic_t)(c1) << 8 ) | (ic_t)(c2) )
 
 typedef struct {
-  char  charset;
-  char  attr;
+  byte  charset;
+  byte  attr;
   ic_t  c;
 } i_str_t;
 

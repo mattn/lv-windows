@@ -1,7 +1,8 @@
 /*
  * console.h
  *
- * All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+ * All rights reserved. Copyright (C) 1996 by NARITA Tomio
+ * $Id: console.h,v 1.4 2003/11/13 03:08:19 nrt Exp $
  */
 
 #ifndef __CONSOLE_H__
@@ -19,11 +20,18 @@ public boolean_t allow_interrupt;
 public boolean_t kb_interrupted;
 public boolean_t window_changed;
 
-public char *ansi_standout;
-public char *ansi_reverse;
-public char *ansi_blink;
-public char *ansi_underline;
-public char *ansi_hilight;
+public byte *ansi_standout;
+public byte *ansi_reverse;
+public byte *ansi_blink;
+public byte *ansi_underline;
+public byte *ansi_hilight;
+
+public byte *cur_left;
+public byte *cur_right;
+public byte *cur_up;
+public byte *cur_down;
+public byte *cur_ppage;
+public byte *cur_npage;
 
 public void ConsoleInit();
 public void ConsoleResetAnsiSequence();
@@ -42,9 +50,9 @@ public void ConsoleSuspend();
 public void ConsoleEnableInterrupt();
 public void ConsoleDisableInterrupt();
 
-public int ConsolePrint( char i );
+public int ConsolePrint( byte i );
 
-public void ConsolePrints( char *str );
+public void ConsolePrints( byte *str );
 public void ConsolePrintsStr( str_t *str, int length );
 
 public void ConsoleFlush();
@@ -55,9 +63,10 @@ public void ConsoleSetCur( int x, int y );	/* zero based */
 public void ConsoleOnCur();
 public void ConsoleOffCur();
 public void ConsoleGoAhead();
+public void ConsoleClearScreen();
 public void ConsoleClearRight();
 public void ConsoleScrollUp();
 public void ConsoleScrollDown();
-public void ConsoleSetAttribute( char attr );
+public void ConsoleSetAttribute( byte attr );
 
 #endif /* __CONSOLE_H__ */

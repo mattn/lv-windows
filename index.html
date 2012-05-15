@@ -1,0 +1,1225 @@
+<!-- ------------------------------------------------------------
+	$Id: index.html,v 1.29 2004/01/16 12:29:21 nrt Exp $
+	Copyright: NARITA Tomio
+------------------------------------------------------------ -->
+<HTML>
+<!-- ------------------------------------------------------------ -->
+<HEAD>
+<TITLE> LV Homepage </TITLE>
+</HEAD>
+<!-- ------------------------------------------------------------ -->
+<BODY BGCOLOR=#ffffe0 TEXT=#c00090 LINK=#0090c0 VLINK=#e000a8 ALINK=#00c090>
+
+<P ALIGN=right>
+<FONT SIZE=-2>All rights reserved. Copyright (C) 1996-2004 by NARITA Tomio</FONT> <BR>
+Last modified at Jan.16th,2004.
+
+<HR>
+
+<P ALIGN=left>
+
+<H1> <IMG SRC="/~nrt/icons/redball.gif" ALT="">
+	LV Homepage
+</H1>
+
+<DL> <DT> <DD>
+<P>
+	<FONT SIZE=+2>lv - <I>a Powerful Multilingual File Viewer / Grep</I></FONT>
+<P>
+	<FONT SIZE=+1> The latest version is ver 4.51:
+	<A HREF="#download"> Download </A> </FONT>
+</DL>
+
+<HR>
+
+<A NAME="tableofcontents">
+<H2> <IMG SRC="/~nrt/icons/petit.blueball.gif" ALT="">
+Table of Contents </H2>
+</A>
+<P>
+<DL><DT><DD>
+<OL>
+<LI> <A HREF="#copyright"> Copyright </A>
+<LI> <A HREF="#feature"> Feature </A>
+<LI> <A HREF="#download"> Download lv </A>
+<LI> <A HREF="#install"> Installation </A>
+<LI> <A HREF="#usage"> Usage </A>
+	<UL>
+	<LI> <A HREF="#execution"> How to run lv? </A>
+	<LI> <A HREF="#option"> Command line options </A>
+	<LI> <A HREF="#configuration"> Configuration </A>
+	<LI> <A HREF="#command"> Run-time commands </A>
+	<LI> <A HREF="#search"> How to input search strings? </A>
+	<LI> <A HREF="#regexp"> Regular expressions </A>
+	</UL>
+<LI> <A HREF="#limitations"> Limitations </A>
+<LI> <A HREF="#codingSystem"> Coding systems </A>
+	<UL>
+	<LI> <A HREF="#iso2022"> ISO 2022 based coding systems </A>
+		<UL>
+		<LI> <A HREF="#iso2022cn"> iso-2022-cn </A>
+		<LI> <A HREF="#iso2022jp"> iso-2022-jp </A>
+		<LI> <A HREF="#iso2022kr"> iso-2022-kr </A>
+		</UL>
+	<LI> <A HREF="#euc"> Extended Unix Code </A>
+		<UL>
+		<LI> <A HREF="#eucchina"> euc-china </A>
+		<LI> <A HREF="#eucjapan"> euc-japan </A>
+		<LI> <A HREF="#euckorea"> euc-korea </A>
+		<LI> <A HREF="#euctaiwan"> euc-taiwan </A>
+		</UL>
+	<LI> <A HREF="#utf"> UCS transformation format </A>
+		<UL>
+		<LI> <A HREF="#utf7"> UTF-7 </A>
+		<LI> <A HREF="#utf8"> UTF-8 </A>
+		</UL>
+	<LI> <A HREF="#otherCodingsystem"> Other coding systems </A>
+		<UL>
+		<LI> <A HREF="#iso8859"> iso-8859-* </A>
+		<LI> <A HREF="#shiftjis"> shift-jis </A>
+		<LI> <A HREF="#big5"> big5 </A>
+		<LI> <A HREF="#hz"> HZ </A>
+		<LI> <A HREF="#raw"> raw mode </A>
+		</UL>
+	</UL>
+<LI> <A HREF="#aboutCodingSystem"> Annotation about encoding/decoding scheme </A>
+	<UL>
+	<LI> <A HREF="#invalid"> Handling of invalid codes </A>
+	<LI> <A HREF="#backspace"> Backspace </A>
+	<LI> <A HREF="#binaryFile"> How to look in a binary file? </A>
+	</UL>
+<LI> <A HREF="#autoSelect"> Auto selection of a coding system </A>
+	<UL>
+	<LI> <A HREF="#defaultCodingSystem"> Default coding system </A>
+	<LI> <A HREF="#selectionMethod"> How does lv select a coding system? </A>
+	</UL>
+<LI> <A HREF="#color"> Extension for text decoration </A>
+<LI> <A HREF="#customize"> Customization </A>
+<!-- <LI> <A HREF="#bug"> Known bugs </A> -->
+<LI> <A HREF="#bugreport"> Bug report </A>
+<LI> <A HREF="relnote.html"> Release note </A>
+<LI> <A HREF="#acknowledgment"> Acknowledgement </A>
+<LI> <A HREF="#ref"> Reference </A>
+</OL>
+</DL>
+
+<HR>
+
+<A NAME="copyright">
+<H2> <IMG SRC="/~nrt/icons/petit.blueball.gif" ALT="">
+Copyright </H2>
+</A>
+
+<P>
+
+<DL> <DT> <DD>
+<PRE>
+All rights reserved. Copyright (C) 1996-2004 by NARITA Tomio.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+</PRE>
+<P>
+  See also <A HREF="GPL.txt">GNU General Public License Version 2</A>.
+</DL>
+
+<HR>
+
+<A NAME="feature">
+<H2> <IMG SRC="/~nrt/icons/petit.blueball.gif" ALT="">
+Feature </H2>
+</A>
+
+<UL>
+<LI> <H3> Multilingual file viewer </H3>
+	<I>lv</I> is a powerful multilingual file viewer.
+	Apparently, lv looks like <I>less</I> (1),
+	a representative file viewer on UNIX as you know,
+	so UNIX people (and <I>less</I> people on other OSs)
+	don't have to learn a burdensome new interface.
+	lv can be used on MSDOS ANSI terminals and almost all UNIX platforms.
+	lv is a currently growing software,
+	so your feedback is welcome
+	and helpful for us to refine the future lv.
+<P>
+<LI> <H3> Multiple coding systems </H3>
+	lv can decode and encode multilingual streams
+	through many coding systems, for example,
+	ISO 2022 based coding systems such as iso-2022-jp,
+	and EUC (Extended Unix Code) like euc-japan.
+	Furthermore,
+	localized coding systems
+	such as shift-jis, big5 and HZ are also supported.
+	lv can be used not only as a file viewer
+	but also as a coding-system translation filter
+	like <I>nkf</I> (1) and <I>tcs</I> (1).
+<P>
+<LI> <H3> Multilingual regular expressions / Multilingual grep </H3>
+	lv can recognize multi-bytes patterns as regular expressions,
+	and lv also provides multilingual <I>grep</I> (1) functionality
+	by giving it another name, <I>lgrep</I>.
+	Pattern matching is conducted in the charset level,
+	so an EUC fragment, for example,
+	can be found in the ISO 2022 tailored streams, of course.
+<P>
+<LI> <H3> Supporting the Unicode standard </H3>
+	lv provides Unicode facilities
+	which enables you to handle Unicode streams encoded in UTF-7 or UTF-8,
+	and lv can also convert their code-points
+	between Unicode and other charsets.
+	So you can display Unicode or foreign texts on your terminal,
+	using the code conversion function
+	to your favorite charsets via Unicode.
+	(However, MSDOS version of lv has none of the Unicode facility.)
+<P>
+<LI> <H3> ANSI escape sequence through </H3>
+	lv can recognize ANSI escape sequences for text decoration.
+	So you can look ANSI-decorated streams
+	such as colored source codes generated by another software
+	just like intended image on ANSI terminals.
+<P>
+<LI> <H3> Completely original </H3>
+	lv is a completely original software
+	including no code drawn from <I>less</I> and <I>grep</I>
+	and other programs at all.
+</UL>
+
+<HR>
+
+<A NAME="sample">
+<H2> <IMG SRC="/~nrt/icons/petit.blueball.gif" ALT="">
+Sample Images </H2>
+</A>
+
+<UL>
+<LI> Multilingual sample image <BR>
+	<A HREF="hello.sample.gif"> <B>``Hello''s</B> on <I> kterm </I> with lv (gif 15Kbytes) </A> <A HREF="hello.sample"> (Original text from Mule demo) </A>
+</UL>
+
+<HR>
+
+<A NAME="download">
+<H2> <IMG SRC="/~nrt/icons/petit.blueball.gif" ALT="">
+Download lv </H2>
+</A>
+
+<DL> <DT> <DD>
+You can download lv archive.
+Changes between older versions are described in
+<A HREF="relnote.html">release note</A>
+(in Japanese).
+</DL>
+
+<UL>
+<LI> <A HREF="/~nrt/freeware/lv451.tar.gz">
+	lv v.4.51 (tar and gzip compressed) </A> <BR>
+<LI> <A HREF="/~nrt/freeware/lv450.tar.gz">
+	lv v.4.50 (tar and gzip compressed) </A> <BR>
+</UL>
+
+<HR>
+
+<A NAME="install">
+<H2> <IMG SRC="/~nrt/icons/petit.blueball.gif" ALT="">
+Installation </H2>
+</A>
+
+<UL>
+	Standard installation:
+	<P>
+	<OL>
+	<LI> Expand lv archive, using gunzip/tar.
+	<LI> Change your working directory to ``(extracted sub directory)/build''.
+	<LI> Execute ``../src/configure'' to configure compiler flags.
+	<LI> Launch ``make''.
+	<LI> Then, launch ``make install'' as root.
+	</OL>
+	<P>
+	MSDOS installation:
+	<P>
+	Before making lv,
+	you need to install
+	<A HREF="http://www.tokyoweb.or.jp/lsi-j/freesoft/lsic330c.lzh">
+	LSI C-86 Compiler
+	</A>
+	(limited and freeware version of <I>LSI C-86</I> for sample usage).
+	<P>
+	<OL>
+	<LI> Expand lv archive, using gunzip/tar.
+	<LI> Change your working directory to ``(extracted sub directory)/src''.
+	<LI> Launch ``make -f Makefile.dos''.
+	<LI> Copy ``lv.hlp'', brief help description, to the same directory
+		as lv.exe settled.
+	</OL>
+	<P>
+	MSDOS version of lv directly outputs ANSI escape sequences
+	without regard to termcap and terminfo.
+	Perhaps you need an ANSI escape sequence driver named ``ANSI.SYS''
+	(or more sophisticated one) on MSDOS
+	including DOS prompt on MS-Windoze.
+	Since Windoze-NT does not seem to prepare such drivers
+	for DOS prompt in default,
+	please look into the driver configuration
+	when lv fails to handle the terminal capability correctly.
+</UL>
+
+<HR>
+
+<A NAME="usage">
+<H2> <IMG SRC="/~nrt/icons/petit.blueball.gif" ALT="">
+Usage </H2>
+</A>
+
+<UL>
+<A NAME="execution">
+<LI> <H3> How to launch lv? </H3>
+</A>
+	When you just wish to display a file on a terminal,
+	please launch lv from command line like this:
+	<P>
+	<DL> <DT> <DD>
+	% lv [options] files ... <BR>
+	</DL>
+	<P>
+	Or, using redirect or pipe-line:
+	<P>
+	<DL> <DT> <DD>
+	% another_command | lv [options] <BR>
+	% lv [options] &lt; file
+	</DL>
+	<P>
+	Compressed files that have suffix ``gz'', ``z'', or ``GZ'', ``Z'' are
+	extracted by lv using <I>zcat</I> (1),
+	and ``bz2'' or ``BZ2'' with <I>bzcat</I> (1).
+	Please install <I>zcat</I> and <I>bzcat</I> that can expand all of them.
+	<P>
+	In case that standard output is not connected to an ordinal terminal
+	but to redirect or pipe-line,
+	lv works as a coding-system or code-points conversion filter
+	like <I>nkf</I> (1) and <I>tcs</I> (1).
+	<P>
+	lv also works like <I>grep</I> (1)
+	by giving it another name, <I>lgrep</I>.
+	Please install symbolic (or hard) link
+	whose name is <I>lgrep</I> to <I>lv</I> (1).
+	Or, <I>lgrep</I> functionality is also turned on the option '-g'.
+	lgrep is used like below:
+	<P>
+	<DL> <DT> <DD>
+	% lgrep [options] <B>grep_pattern</B> files ... <BR>
+	% another_command | lgrep [options] <B>grep_pattern</B> <BR>
+	% lgrep [options] <B>grep_pattern</B> &lt; file
+	</DL>
+	<P>
+	The coding-system of <B>grep_pattern</B> can be specified
+	as ``keyboard coding system'' (see below).
+<P>
+<A NAME="option">
+<LI> <H3> Command line options </H3>
+</A>
+	<P>
+	<DL>
+	<DT> -A&lt;coding-system&gt;
+		<DD> Set all coding systems to coding-system.
+	<DT> -I&lt;coding-system&gt;
+		<DD> Set input coding system to coding-system.
+	<DT> -K&lt;coding-system&gt;
+		<DD> Set keyboard coding system to coding-system.
+		If it is not set, output coding system will be applied to it.
+	<DT> -O&lt;coding-system&gt;
+		<DD> Set output coding system to coding-system.
+	<DT> -P&lt;coding-system&gt;
+		<DD> Set pathname coding system to coding-system.
+	<DT> -D&lt;coding-system&gt;
+		<DD> Set default EUC coding system to coding-system.
+	<P>
+	<DL> <DT> <H3> coding-system </H3> <DD>
+	<UL>
+	<LI> a: auto-select <BR>
+		Its entity is iso-2022-kr
+		until an 8bit code is found.
+	<LI> c: iso-2022-cn
+	<LI> j: iso-2022-jp
+	<LI> k: iso-2022-kr
+	<LI> e: Extended Unix Code
+		<UL>
+		<LI> ec: euc-china
+		<LI> ej: euc-japan
+		<LI> ek: euc-korea
+		<LI> et: euc-taiwan
+		</UL>
+	<LI> u: UCS transformation format
+		<UL>
+		<LI> u7: UTF-7
+		<LI> u8: UTF-8
+		</UL>
+	<LI> l: iso-8859-1..9
+		<UL>
+		<LI> l1..9:          iso-8859-1..9
+		<LI> l0:             iso-8859-10
+		<LI> lb,ld,le,lf,lg: iso-8859-11,13,14,15,16
+		</UL>
+	<LI> s: shift-jis
+	<LI> b: big5
+	<LI> h: HZ
+	<LI> r: raw mode <BR>
+		No decoding and encoding are performed.
+	</UL>
+	</DL>
+	<P>
+	<H3> Coding-system translations / Code-points conversions: </H3>
+	<P>
+	iso-2022-cn, -jp, -kr can be converted into euc-china or -taiwan,
+	euc-japan, euc-korea, respectively (and vice versa).
+	shift-jis uses the same internal code-points
+	as iso-2022-jp and euc-japan.
+	<P>
+	Since big5 characters can be converted into CNS 11643-1992
+	with negligible incompleteness,
+	big5 streams can be translated into iso-2022-cn or euc-taiwan
+	(and vice versa) with code-points conversion.
+	Note that the iso-2022-cn referred here is not GB sequence,
+	only just CNS one.
+	You should remember that lv cannot translate big5 into GB directly.
+	<P>
+	The search function of lv may not work correctly when lv additionally
+	performs ``code-points'' conversion
+	(not ``coding-system'' translation),
+	because visible code and internal code are different from each other.
+	lv will try to avoid this problem with
+	converting charsets of search patterns automatically,
+	but this function is not always perfect.
+	<P>
+	<DT> -W&lt;number&gt; <DD> Screen width
+	<DT> -H&lt;number&gt; <DD> Screen height
+	<DT> -E'&lt;editor&gt;'	<DD> Editor name (default 'vi -c %d') <BR>
+		``%d'' means the line number of current position in a file.
+	<DT> -q <DD> Assert there is delete/insert-lines control <BR>
+		Please set this option on a MSDOS ANSI terminal
+		that has capability to delete and/or insert lines.
+		As to termcap and terminfo version,
+		it will be set automatically.
+	<P>
+	<DT> -Ss&lt;seq&gt; <DD> Set ANSI Standout sequence to <seq>  (default "7")
+	<DT> -Sr&lt;seq&gt; <DD> Set ANSI Reverse sequence to <seq>   (default "7")
+        <DT> -Sb&lt;seq&gt; <DD> Set ANSI Blink sequence to <seq>     (default "5")
+        <DT> -Su&lt;seq&gt; <DD> Set ANSI Underline sequence to <seq> (default "4")
+        <DT> -Sh&lt;seq&gt; <DD> Set ANSI Highlight sequence to <seq>   (default "1") <BR>
+		These sequences are inserted
+		between ``<TT>ESC [</TT>'' and ``<TT>m</TT>''
+		to construct full ANSI escape sequences.
+	<P>
+	<DT> -T&lt;number&gt; <DD>
+		Set Threshold-code which divides Unicode code-points in
+                two regions. Characters belonging to the lower region are
+                assumed to have a width of one, and the higher characters
+                are equated to a width of two. (Default: 12288, = 0x3000)
+	<DT> -m <DD>
+		Force Unicode code-points which have the same glyphs as
+		iso-8859-* to be Mapped to iso-8859-* in a conversion from
+		Unicode to another character set which also has the
+		corresponding code-points, in particular, Asian charsets.
+	<P>
+	<DT> -a <DD> Adjust character set for search pattern (default)
+	<DT> -c <DD> Allow ANSI escape sequences for text decoration (Color)
+	<DT> -d, -i <DD> Make regexp-searches ignore case (case folD search)
+			(default)
+	<DT> -f <DD> Substitute Fixed strings for regular expressions
+	<DT> -k <DD> Convert X0201 Katakana to X0208
+	<DT> -l <DD> Allow physical lines of each logical line printed
+			on the screen to be concatenated for cut and paste
+			after screen refresh
+	<DT> -s	<DD> Force old pages to be swept out from the screen Smoothly
+	<DT> -u <DD> Unify several character sets, eg. JIS X0208 and C6226.
+			In addition, lv equates ISO 646 variants,
+			eg. JIS X0201-Roman,
+			and unknown charsets with ASCII.
+	<DT> -g <DD> Turn on lgrep mode.
+	<DT> -n <DD> Prefix each line of output with the line number within its input file on lgrep.
+	<DT> -v <DD> Invert the sense of matching on lgrep.
+	<DT> -z <DD> Enable HZ auto-detection (also enabled by run-time C-t).
+	<P>
+	<DT> -+ <DD> Clear all options <BR>
+		You can also turn OFF specified options,
+		using ``+&lt;option&gt;'' like +c, +d, ... +z.
+	<P>
+	<DT> - <DD> Treat the following arguments as filenames
+	<P>
+	<DT> -V <DD> Show lv version
+	<DT> -h <DD> Show this help
+	</DL>
+<P>
+<A NAME="configuration">
+<LI> <H3> Configuration </H3>
+</A>
+	Options can be described in the configuration file ``.lv''
+	(``_lv'' on MSDOS) located at you home directory.  If and only if you
+	use MSDOS, you can locate ``_lv'' at current working directory.
+	They can be also described in the environment variable LV.
+	<P>
+	Every configuration will be overloaded in the following order if there is.
+	Command line options are always read finally.
+	<P>
+	<OL>
+	<LI> .lv located at your home directory
+	<LI> (_lv located at current working directory: MSDOS only)
+	<LI> Environment variable LV
+	<LI> Command line options
+	</OL>
+	<P>
+	Examples:
+	<P>
+	<UL>
+	<LI> MSDOS (Input is shift-jis, Screen height is 25 lines, Highlight seq is "1;45", Underline seq is "1")<BR>
+	<TT> set LV=-Is -H25 -Sh1;45 -Su1 </TT>
+	<P>
+	<LI> UNIX csh (Input is HZ-enabled auto-select, Output and Keyboard is both iso-2022-cn) <BR>
+	<TT> setenv LV '-z -Oc -Dec' </TT>
+	</UL>
+<P>
+<A NAME="command">
+<LI> <H3> Run-time commands </H3>
+</A>
+	<P>
+	<DL>
+	<DT> 0-9: <DD> Argument
+	<DT> g, &lt;: <DD> Jump to the line number (default: top of the file)
+	<DT> G, &gt;: <DD> Jump to the line number (default: bottom of the file)
+	<DT> p: <DD> Jump to the percentage position in line numbers (0-100)
+	<DT> b, C-b: <DD> Previous page
+	<DT> u, C-u: <DD> Previous half page
+	<DT> k, w, C-k, y, C-y, C-p: <DD> Previous line
+	<DT> j, C-j, e, C-e, C-n, CR: <DD> Next line
+	<DT> d, C-d: <DD> Next half page
+	<DT> f, C-f, C-v, SP: <DD> Next page
+	<DT> F: <DD> Jump  to the end of file, and wait for a data to be
+		appended to the file until interrupted.
+	<DT> /&lt;string&gt;: <DD> Find a string in the forward direction (regular expression)
+	<DT> ?&lt;string&gt;: <DD> Find a string in the backward direction (regular expression)
+	<DT> n: <DD> Repeat previous search in the forward direction
+	<DT> N: <DD> Repeat previous search in the backward direction (not REVERSE)
+	<DT> C-l: <DD> Redisplay all lines
+	<DT> r, C-r: <DD> Refresh screen and memory
+	<DT> R: <DD> Reload the current file
+	<DT> :n: <DD> Examine the next file
+	<DT> :p: <DD> Examine the previous file
+	<DT> t: <DD> Toggle input coding systems
+	<DT> T: <DD> Toggle input coding systems reversely
+	<DT> C-t: <DD> Toggle HZ decoding mode
+	<DT> v: <DD> Launch the editor defined by option -E
+	<DT> C-g, =: <DD> Show file information (filename, position, coding system)
+	<DT> V: <DD> Show LV version
+	<DT> C-z: <DD> Suspend (call SHELL or ``command.com'' under MSDOS)
+	<DT> q, Q: <DD> Quit
+	<DT> UP/DOWN: <DD> Previous/Next line
+	<DT> LEFT/RIGHT: <DD> Previous/Next half page
+	<DT> PageUp/PageDown: <DD> Previous/Next page
+	</DL>
+<P>
+<A NAME="search">
+<LI> <H3> How to input search strings? </H3>
+</A>
+	You can input a string which consists of multi-bytes characters
+	and search the string as a regular expression.
+	lv's regular expression is similar to Mule's one.
+	<P>
+	The following keys have special meanings in the keyboard input:
+	<P>
+	<DL>
+		<DT> C-m, Enter <DD> Enter the current string
+		<DT> C-h, BS, DEL <DD> Delete one character (backspace)
+		<DT> C-u <DD> Cancel the current string and try again
+		<DT> C-p <DD> Restore a few old strings incrementally (history)
+		<DT> C-g <DD> Quit
+	</DL>
+<P>
+<A NAME="regexp">
+<LI> <H3> Regular expressions </H3>
+</A>
+	<UL>
+	<LI> `. (period)' <BR>
+		matches any single character.
+		For example,
+		``a.b'' matches any three-character string which begins with
+		`a' and ends with `b'.
+	<LI> `*' <BR>
+		constructs repetition of an expression more than 0 times.
+		For example,
+		``ab*'' matches `a', `ab' `abb', etc.
+	<LI> `+' <BR>
+		constructs repetition of an expression more than once.
+		For example,
+		``ab+'' matches `ab', `abb', but not `a'.
+	<LI> `?' <BR>
+		matches the preceding expression either once or not at all.
+		For example,
+		``ca?r'' matches `car' or `cr'; nothing else.
+	<LI> `[ ... ]' <BR>
+		makes a character set.
+		For example,
+		``[ab]+'' matches any string composed of just `a's and `b's.
+		You can also include character ranges in a character set,
+		by writing two characters with a `-' between them.
+		For example,
+		``[a-z]'' matches any lower-case letter.
+		If the characters implies a multi-bytes charset,
+		lv makes a multi-bytes range,
+		ordering code-points as unsigned integer.
+		Mutually overlapping ranges (or charset) are not guaranteed.
+	<LI> `[^ ... ]' <BR>
+		makes a complemented character set.
+		For example,
+		``[^a-z0-9A-Z]'' matches all characters
+		*except* letters and digits.
+	<LI> `^' <BR>
+		matches the empty string at the beginning of a line.
+	<LI> `$' <BR>
+		is similar to `^' but matches only at the end of a line.
+	<LI> `\' <BR>
+		quotes the special characters.
+	<LI> `\1' <BR>
+		matches characters each of which has a width of 1 column.
+	<LI> `\2'<BR>
+		matches characters each of which has a width of 2 columns.
+	<LI> `\|' <BR>
+		specifies an alternative.
+		For example,
+		``foo\|bar'' matches either `foo' or `bar' but no other string.
+	<LI> `\( ... \)' <BR>
+		\(, \) is a grouping construct.
+		For example,
+		``ba\(na\)*'' matches `ba', `bana', `banana', etc.
+	</UL>
+</UL>
+
+<HR>
+
+<A NAME="limitations">
+<H2> <IMG SRC="/~nrt/icons/petit.blueball.gif" ALT="">
+Limitations </H2>
+</A>
+
+<UL>
+<LI> <H3> Up to 8192 bytes per a logical line </H3>
+	lv manages file location pointers logically,
+	separating LOGICAL lines by LF (line feed) or CR (carriage return),
+	or CR/LF.
+	The length of a logical line is limited up to 8192 bytes.
+	And lv insert a LF forcibly when a line has a length over 8192 bytes.
+	Note that all of CRs or CR/LF are replaced with single LF on UNIX
+	during decoding.
+	As to MSDOS,
+	CRs are inserted before every LFs without thinking.
+<P>
+<LI> <H3> Physical lines per a logical line </H3>
+	A logical line is divided into PHYSICAL lines
+	to fall into the screen width.
+	lv limits physical lines up to "characters / 16" lines length
+	per a logical line for management of them.
+	Note that when a logical line has more lines,
+	the rest of the limit are truncated and not displayed at all.
+<P>
+<LI> <H3> Limitation of encoding space </H3>
+	Encoding space is limited upto "characters * 4" bytes length
+	for each decoded string.
+	Even if encoded string would be longer than that,
+	the encoding process is dropped at the limit.
+<P>
+<LI> <H3> Limitation of the number of logical lines </H3>
+	The number of logical lines is also limited.
+	Currently,
+	lv can handle up to about 2 Giga lines on UNIX
+	(65000 lines on MSDOS).
+	Note that lines which exceed this limitation cannot be displayed at all.
+</UL>
+
+<HR>
+
+<A NAME="codingSystem">
+<H2> <IMG SRC="/~nrt/icons/petit.blueball.gif" ALT="">
+Coding systems </H2>
+</A>
+<UL>
+<A NAME="iso2022">
+<LI> <H3> ISO 2022 based coding systems </H3>
+</A>
+	lv handles ISO 2022 based coding systems as
+	they are stateless on the logical line level.
+	So you have to specify a coding system before decoding,
+	and lv maybe adds redundant codes during encoding.
+	<P>
+	<UL>
+	<A NAME="iso2022cn">
+	<LI> iso-2022-cn <BR>
+	</A>
+	RFC 1922 tailored coding system.
+	<P>
+	<TABLE BORDER="2" CELLSPACING="2" CELLPADDING="2">
+	<TR> <TH> <TH> G0 <TH> G1 <TH> G2 <TH> G3
+	<TR> <TD> Designation <TD> ASCII <TD> GB 2312-80, CNS 11643-1992 Plane 1, ISO-IR-165 <TD> CNS 11643-1992 Plane 2 <TD> CNS 11643-1992 Plane 3..7
+	</TABLE>
+	<P>
+	<A NAME="iso2022jp">
+	<LI> iso-2022-jp <BR>
+	</A>
+	RFC 1468 and 1554 tailored coding system.
+	All 94charsets use G0, and all 96charsets use G2 with single shift
+	inside lv.
+	<P>
+	<A NAME="iso2022kr">
+	<LI> iso-2022-kr <BR>
+	</A>
+	RFC 1557 tailored coding system.
+	All charsets except ASCII use only G1 with locking shift
+	inside lv.
+	</UL>
+<P>
+<A NAME="euc">
+<LI> <H3> Extended Unix Code </H3>
+</A>
+	lv can decode mixture texts of euc-* and iso-2022-*,
+	when you select euc-* as the input coding system.
+	<P>
+	<UL>
+	<A NAME="eucchina">
+	<LI> euc-china <BR>
+	</A>
+	<TABLE BORDER="2" CELLSPACING="2" CELLPADDING="2">
+	<TR> <TH> <TH> G0 <TH> G1 <TH> G2 <TH> G3
+	<TR> <TD> Designation <TD> ASCII <TD> GB 2312-80 <TD> not used <TD> not used
+	</TABLE>
+	<P>
+	<A NAME="eucjapan">
+	<LI> euc-japan <BR>
+	</A>
+	<TABLE BORDER="2" CELLSPACING="2" CELLPADDING="2">
+	<TR> <TH> <TH> G0 <TH> G1 <TH> G2 <TH> G3
+	<TR> <TD> Designation <TD> ASCII <TD> JIS X 0208 <TD> JIS X 0201 Katakana <TD> JIS X 0212
+	</TABLE>
+	<P>
+	<A NAME="euckorea">
+	<LI> euc-korea <BR>
+	</A>
+	<TABLE BORDER="2" CELLSPACING="2" CELLPADDING="2">
+	<TR> <TH> <TH> G0 <TH> G1 <TH> G2 <TH> G3
+	<TR> <TD> Designation <TD> ASCII <TD> KS C 5601-1987 <TD> not used <TD> not used
+	</TABLE>
+	<P>
+	<A NAME="euctaiwan">
+	<LI> euc-taiwan <BR>
+	</A>
+	<TABLE BORDER="2" CELLSPACING="2" CELLPADDING="2">
+	<TR> <TH> <TH> G0 <TH> G1 <TH> G2 <TH> G3
+	<TR> <TD> Designation <TD> ASCII <TD> CNS 11643 Plane 1 <TD> CNS 11643 Plane 2-7 <TD> not used
+	</TABLE>
+	</UL>
+<P>
+<A NAME="utf">
+<LI> <H3> UCS transformation format </H3>
+</A>
+	<UL>
+	<A NAME="utf7">
+	<LI> UTF-7 <BR>
+	</A>
+	A Mail-Safe Transformation Format of Unicode.
+	See RFC 1642 (Experimental) and
+	<A HREF="http://www.cm.spyglass.com/unicode/standard/utf7.html">
+	UTF-7 Encoding Form
+	</A>.
+	<P>
+	<A NAME="utf8">
+	<LI> UTF-8 <BR>
+	</A>
+	8bit Unicode encoding.
+	See
+	<A HREF="http://www.cm.spyglass.com/unicode/standard/wg2n1036.html">
+	UCS Transformation Format 8 (UTF-8).
+	</A>
+	</UL>
+	<P>
+	lv can convert character codesets
+	between Unicode and the following charsets:
+	GB 2312-80, JIS X 0208, JIS X 0212, KSC 5601-1987,
+	Big Five, CNS 11643-1992 Plane 1-2,
+	and ISO 8859-1..16.
+	<P>
+	Currently lv's mapping table is based on Unicode 1.1.
+	<P>
+	<TABLE BORDER="2" CELLSPACING="2" CELLPADDING="2">
+	<TR> <TH> Encoding <TH> Charset used for mapping from Unicode
+	<TR> <TD> iso-2022-cn <TD> GB 2312-80 (primary), CNS 11643-1992 (secondary), (ISO 8859-*)
+	<TR> <TD> iso-2022-jp <TD> JIS X0208, JIS X0212, JIS X0201, (ISO 8859-*)
+	<TR> <TD> iso-2022-kr <TD> KSC 5601-1987, (ISO 8859-*)
+	<TR> <TD> euc-china <TD> GB 2312-80
+	<TR> <TD> euc-japan <TD> JIS X0208, JIS X0212, JIS X0201
+	<TR> <TD> euc-korea <TD> KSC 5601-1987
+	<TR> <TD> euc-taiwan <TD> CNS 11643-1992 Plane 1-2
+	<TR> <TD> shift-jis <TD> JIS X0208, JIS X0201
+	<TR> <TD> big5 <TD> Big Five
+	</TABLE>
+	<P>
+	When you output Unicode CJK unified ideographs through iso-2022-cn,
+	GB 2312-80 is used primarily,
+	and the rest which are not included in GB
+	are mapped into CNS 11643-1992.
+<P>
+<A NAME="otherCodingsystem">
+<LI> <H3> Other coding systems </H3>
+</A>
+	<UL>
+	<A NAME="iso8859">
+	<LI> iso-8859-* <BR>
+	</A>
+	ASCII and one of ISO 8859/1-16 are designated on G0:G1
+	invoked to GL:GR, respectively.
+	<P>
+	<A NAME="shiftjis">
+	<LI> shift-jis <BR>
+	</A>
+	lv can decode mixture texts of shift-jis and iso-2022-jp,
+	when you select shift-jis as the input coding system.
+	<P>
+	Note that euc-japan and shift-jis are mutually exclusive for decoding.
+	<P>
+	<A NAME="big5">
+	<LI> big5 <BR>
+	</A>
+	Since big5 characters can be partially converted
+	into CNS 11643-1992 Plane 1-2,
+	lv can load big5 streams
+	and output them through ISO 2022 based coding systems or euc-taiwan.
+	Several big5 characters which have no correspondence to CNS
+	are output as ``?'' (question mark).
+	<P>
+	<A NAME="hz">
+	<LI> HZ <BR>
+	</A>
+	HZ is defined in RFC 1843.
+	It would consist of four escape sequences, ~~, ~{, ~}, and ~\n,
+	but lv does not support the last one, ~\n sequence,
+	and leaves it alone.
+	You should remember that lv does not conform full of RFC 1843.
+	HZ will be decoded as euc-china in lv.
+	<P>
+	<A NAME="raw">
+	<LI> raw mode <BR>
+	</A>
+	No decoding and encoding is performed.
+	</UL>
+</UL>
+
+<HR>
+
+<A NAME="aboutCodingSystem">
+<H2> <IMG SRC="/~nrt/icons/petit.blueball.gif" ALT="">
+Annotation about encoding/decoding scheme </H2>
+</A>
+<UL>
+<A NAME="invalid">
+<LI> <H3> Handling of invalid codes </H3>
+</A>
+	Characters belonging to invalid character sets, for example,
+	JIS X 0212 for shift-jis,
+	are printed as ASCII at its code-point
+	up to originally supposed width.
+	<P>
+	Invalid characters which cause error state
+	under specified coding system
+	might be ignored partially.
+	If it is printable,
+	it will be output as a control character.
+<P>
+<A NAME="backspace">
+<LI> <H3> Backspace </H3>
+</A>
+	BS (backspace) characters included in files
+	are interpreted as follows:
+	<P>
+	<UL>
+	<LI> &lt;char&gt; BS &lt;char&gt; <BR>
+		Highlighted &lt;char&gt;
+	<LI> ``_'' BS &lt;char&gt; <BR>
+		Underlined &lt;char&gt;
+	<LI> ``o'' BS ``+'' <BR>
+		Highlighted ``o''
+	<LI> Otherwise <BR>
+		BS deletes a character on the left side of it.
+	</UL>
+<P>
+<A NAME="binaryFile">
+<LI> <H3> How to look in a binary file? </H3>
+</A>
+	Decoding of lv is robust even for binary files.
+	You can look in a binary file and decode embedded strings in it.
+	However,
+	there might be ignored characters if you decode binary files
+	through a particular coding system.
+	Option -Ir, raw decoding, saves such ignored characters other than CRs.
+</UL>
+
+<HR>
+
+<A NAME="autoSelect">
+<H2> <IMG SRC="/~nrt/icons/petit.blueball.gif" ALT="">
+Auto selection of a coding system </H2>
+</A>
+<UL>
+<A NAME="defaultCodingSystem">
+<LI> <H3> Default coding system </H3>
+</A>
+	Default input coding system is auto-select described below.
+	In auto selection state,
+	lv decodes an input stream as iso-2022-kr.
+	Default output coding system is iso-2022-jp on UNIX,
+	or shift-jis on MSDOS (as long as Japanese version of lv).
+	<P>
+	If you don't specify any input coding system,
+	that is, when auto-select is specified,
+	lv will select input coding system automatically.
+<P>
+<A NAME="selectionMethod">
+<LI> <H3> How does lv select a coding system? </H3>
+</A>
+	Auto selection state continues until an 8bit code is found,
+	and the auto selection of input coding system is performed on demand.
+	<P>
+	When a 8bit code is found during file loading
+	and the input coding syste is auto-select (its entity is iso-2022-kr),
+	lv examines ``the first line that contains the first 8bit code''.
+	Then lv tries several 8bit decodings as below:
+	<P>
+	<UL>
+	<LI> simple euc decoding test (included euc-china and euc-korea)
+	<LI> euc-japan (or euc-taiwan) decoding test
+	<LI> big5 decoding test
+	<LI> shift-jis decoding test
+	<LI> utf-8 decoding test (only on platforms other than MSDOS)
+	</UL>
+	<P>
+	The coding system cheking results are examined in the following order:
+	<P>
+	<OL>
+	<LI> Only when there is no error state in simple euc decoding,
+		lv will assumes the input coding system is
+		default EUC coding system,
+		which is defined by option -D.
+	<LI> Only when there is no error state in euc-japan (or euc-taiwan) decoding,
+		lv will assumes the input coding system is euc-japan
+		(Japanese version).
+		Since there is no syntactical difference
+		between euc-taiwan and euc-japan,
+		this action is to be altered in Taiwanese environment.
+	<LI> Only when there is no error state in big5 decoding,
+		lv will assumes the input coding system is big5.
+		Since big5 sequences are similar to EUCs,
+		sometimes its streams will be misunderstood as EUCs.
+	<LI> Only when there is no error state in shift-jis decoding,
+		lv will assumes the input coding system is shift-jis.
+		Since shift-jis shares code-points with EUCs partially,
+		its streams may be possibly misunderstood as EUCs.
+	<LI> Only when there is no error state in utf-8 decoding,
+		lv will assumes the input coding system is utf-8.
+		Like big5 and shift-jis,
+		sometimes its steams will be misinterpreted
+		as another coding system.
+	<LI> Otherwise,
+		lv will assumes the input coding system is
+		ISO 8859-1 (latin-1).
+	</OL>
+	<P>
+	If a text contains only EUC code points,
+	it is hard to identify the language
+	the EUC coding system represents.
+	So lv provides default EUC coding system
+	used when lv chooses the input coding system from EUCs.
+	Default EUC coding system is set by option -D
+	(euc-japan on Japanese version LV).
+	<P>
+	You can toggle coding systems even while viewing a file
+	by run-time command `t' and `T',
+	which traverses through all coding sytems implemented in LV.
+	In addition,
+	you can toggle HZ decoding mode by C-t on demand.
+	<P>
+	You should remember that
+	the auto-selection mechanism of LV works incorrectly in some cases.
+	Especially,
+	if a text contains only JIS X 0201 Katakana in shift-jis,
+	it will be misinterpreted as euc-japan.
+	<P>
+	If the result of auto selection is incorrect
+	and you know the input coding system,
+	please set it by the option -I,
+	which disables auto selection.
+</UL>
+
+<HR>
+
+<A NAME="color">
+<H2> <IMG SRC="/~nrt/icons/petit.blueball.gif" ALT="">
+Extension for text decoration </H2>
+</A>
+<UL>
+<LI>
+	Option -c enables ANSI escape sequences
+	in the form of ESC [ ps ; ... ; ps m,
+	where <B>ps</B> takes following values:
+	<P>
+	<UL>
+	<LI> 1: Highlight
+	<LI> 4: Underline
+	<LI> 5: Blink
+	<LI> 7: Reverse
+	<LI> 30: Black
+	<LI> 31: Red
+	<LI> 32: Green
+	<LI> 33: Yellow
+	<LI> 34: Blue
+	<LI> 35: Magenta
+	<LI> 36: Cyan
+	<LI> 37: White
+	<LI> 40-47: Reverse of 30-37
+	</UL>
+<P>
+<LI> Every sequence is independent of one another.
+	lv will reset all values before new value is set.
+	Meanwhile,
+	multiple <B>ps</B>s are accepted within one sequence.
+<LI> Every sequence is only effective within a logical line.
+	On crossing logical lines,
+	all attributes are reset automatically.
+	Please recall that lv handles each logical line as stateless.
+<LI> You can specify one color at once.
+	When multiple colors are specified,
+	the last one is effective.
+<LI> As to reversed characters,
+	a specified color is applied to the ``reversed background color''.
+	You cannot specify the color of ``out-clipped characters''.
+<LI> You can customize actual sequences to be output to the screen.
+	Please specify them by option -S.
+</UL>
+
+<HR>
+
+<A NAME="customize">
+<H2> <IMG SRC="/~nrt/icons/petit.blueball.gif" ALT="">
+Customization </H2>
+</A>
+<UL>
+<LI> Customization for command key bindings <BR>
+	Please modify the keybind table in keybind.h.
+<P>
+<LI> Customization for terminal controls <BR>
+	When you add a new terminal control,
+	please add codes to console.c.
+	When you wish to change interpretation of escape sequences,
+	please modify console.c and escape.c.
+	However, some ANSI escape sequences are configurable through options.
+<P>
+<LI> Changing default screen size of MSDOS ANSI terminals <BR>
+	Default screen size is 80 columns by 24 rows.
+	To change this,
+	please modify console.c.
+	However, screen size can be specified through options.
+<P>
+<LI> Changing default coding systems <BR>
+	Currently, Japanese version of lv uses following values:
+	<P>
+	<DL><DT><DD>
+	<TABLE BORDER="2" CELLSPACING="2" CELLPADDING="2">
+	<TR> <TH> <TH> MSDOS <TH> UNIX
+	<TR> <TD> Input:       <TD> auto-select <TD> auto-select
+	<TR> <TD> Keyboard:    <TD> shift-jis   <TD> iso-2022-jp
+	<TR> <TD> Output:      <TD> shift-jis   <TD> iso-2022-jp
+	<TR> <TD> Pathname:    <TD> shift-jis   <TD> iso-2022-jp
+	<TR> <TD> Default EUC: <TD> euc-japan   <TD> euc-japan
+	</TABLE>
+	</DL>
+	<P>
+	To change above,
+	please modify lv.c.
+	However,
+	those coding systems can be specified through options.
+<P>
+<LI> Customization for coding systems <BR>
+	Currently,
+	an ISO 2022 universal decoder,
+	and EUC, HZ, shift-jis, big5, UTF-7, UTF-8 decoders are implemented.
+	When you wish to add another coding systems,
+	please add source codes,
+	referencing ctable_t.h, ctable.c, encode.c, decode.c, iso2022.c, etc.
+<P>
+<LI> Customization for character sets <BR>
+	Please add your favorite character sets,
+	referencing itable_t.h, itable.c, etc.
+	Currently recognized character sets are itemized below.
+	You have to specify code length (bytes) and graphical width (columns)
+	of each character as attributes.
+	There is no necessity that
+	code length and graphical width equal each other.
+	Current implementation does not support per character length,
+	but you can specify the maximum length of them in itable,
+	it may not cause problems.
+	You cannot add charsets whose code length is more than 3 bytes.
+	(If you desire to do it,
+	you can add only little modification to lv,
+	so up to 4bytes charsets can be supported by lv.)
+	<P>
+	<DL> <DT> <DD>
+	ISO 646 United States (ANSI X3.4-1968) <BR>
+	JIS X0201-1976 Japanese Roman <BR>
+	JIS X0201-1976 Japanese Katakana <BR>
+	ISO 8859/1 Latin alphabet No.1 Right part <BR>
+	ISO 8859/2 Latin alphabet No.2 Right part <BR>
+	ISO 8859/3 Latin alphabet No.3 Right part <BR>
+	ISO 8859/4 Latin alphabet No.4 Right part <BR>
+	ISO 8859/5 Cyrillic alphabet <BR>
+	ISO 8859/6 Arabic alphabet <BR>
+	ISO 8859/7 Greek alphabet <BR>
+	ISO 8859/8 Hebrew alphabet <BR>
+	ISO 8859/9 Latin alphabet No.5 Right part <BR>
+	ISO 8859/10 Latin alphabet No.6 Right part (Nordic) <BR>
+	ISO 8859/11 Thai alphabet <BR>
+	ISO 8859/13 Latin alphabet No.7 Right part (Baltic Rim) <BR>
+	ISO 8859/14 Latin alphabet No.8 Right part (Celtic) <BR>
+	ISO 8859/15 Latin alphabet No.9 Right part <BR>
+	ISO 8859/16 Latin alphabet No.10 Right part <BR>
+	JIS C 6226-1978 Japanese kanji <BR>
+	GB 2312-80 Chinese hanzi <BR>
+	JIS X 0208-1983 Japanese kanji <BR>
+	KS C 5601-1987 Korean graphic charset <BR>
+	JIS X 0212-1990 Supplementary charset <BR>
+	ISO-IR-165 <BR>
+	CNS 11643-1992 Plane 1..7 <BR>
+	JIS X 0213-2000 Plane 1..2 <BR>
+	Big5 Traditional Chinese <BR>
+	Unicode 1.1 <BR>
+	</DL>
+	<P>
+	These charset are only recognized by lv,
+	and it is depend on your terminal's capability
+	that actually can display them or not.
+	<P>
+	Inversely,
+	you can handle non-listed charsets above as latin-1
+	in such case as a 8bit coding system is displayed on a 8bit terminal.
+	(If there is no code conversion and each character has one column.)
+</UL>
+
+<!--
+<HR>
+
+<A NAME="bug">
+<H2> <IMG SRC="/~nrt/icons/petit.blueball.gif" ALT="">
+Known bugs </H2>
+</A>
+
+<UL>
+<LI> No bugs are reported.
+</UL>
+-->
+
+<HR>
+
+<A NAME="bugreport">
+<H2> <IMG SRC="/~nrt/icons/petit.blueball.gif" ALT="">
+Bug report </H2>
+
+<DL><DT><DD>
+Please send a bug report to
+<I><A HREF="mailto:nrt@ff.iij4u.or.jp">nrt@ff.iij4u.or.jp</A></I>
+when you find any bugs around lv.
+</DL>
+
+<HR>
+
+<A NAME="relnote">
+<H2> <IMG SRC="/~nrt/icons/petit.blueball.gif" ALT="">
+Release note </H2>
+</A>
+
+<DL><DT><DD>
+<A HREF="relnote.html"> Click here.</A> (in Japanese)
+</DL>
+
+<HR>
+
+<A NAME="acknowledgment">
+<H2> <IMG SRC="/~nrt/icons/petit.blueball.gif" ALT="">
+Acknowledgement </H2>
+</A>
+
+<DL><DT><DD>
+	I would like to express my 感謝の気持ち for everybody
+	who works together in connection with lv,
+	especially for package maintainers,
+	bug reporters,
+	and early beta testing members:
+	<P>
+	後藤さん(gotom@debian.or.jp) <BR>
+	<P>
+	野村さん(nomu@ipl.mech.nagoya-u.ac.jp) <BR>
+	石塚さん(ishizuka@db.is.kyushu-u.ac.jp) <BR>
+	野中さん(nona@in.it.okayama-u.ac.jp) <BR>
+	松原さん(moody@osk.threewebnet.or.jp) <BR>
+	村井さん(murai@geophys.hokudai.ac.jp) <BR>
+</DL>
+
+<HR>
+
+<A NAME="ref">
+<H2> <IMG SRC="/~nrt/icons/petit.blueball.gif" ALT="">
+Reference </H2>
+</A>
+
+<UL>
+<LI> JIS X 0202-1991 情報交換用符号の拡張法 <BR>
+	Information processing - ISO 7-bit and 8-bit coded character sets
+	- Code extension techniques
+<LI> JIS X 0208-1990 情報交換用漢字符号 <BR>
+	Code of the Japanese graphic character set for information interchange
+<LI> JIS X 0212-1990 情報交換用漢字符号 - 補助漢字 <BR>
+	Code of the supplementary Japanese graphic character set for
+	information interchange
+<LI> RFC 1468 Japanese Character Encoding for Internet Messages
+<LI> RFC 1554 ISO-2022-JP-2: Multilingual Extension of ISO-2022-JP
+<LI> RFC 1557 Korean Character Encoding for Internet Messages
+<LI> RFC 1843 HZ - A Data Format for Exchanging Files of Arbitrarily Mixed Chinese and ASCII characters
+<LI> RFC 1922 Chinese Character Encoding for Internet Messages
+<LI> RFC 2152 UTF-7 A Mail-Safe Transformation Format of Unicode <BR>
+<LI> RFC 2279 UTF-8, a transformation format of ISO 10646
+<LI> Understanding Japanese Information Processing (『日本語情報処理』) <BR>
+	<I> Ken Lunde </I> O'Reilly & Associates, Inc. ISBN 1-56592-043-0
+<LI> <A HREF="ftp://ftp.ora.com/pub/examples/nutshell/ujip/doc/cjk.inf">CJK.INF Version 2.1</A> (July 12, 1996) <BR>
+	Online Companion to "Understanding Japanese Information Processing" <BR>
+	<I> Ken Lunde </I>
+<LI> <A HREF="http://www.unicode.org/unicode/onlinedat/online.html"> Unicode Mapping Data </A> at the Unicode Consortium web site.
+<LI> Compilers - Principles, Techniques, and Tools <BR>
+	<I> Alfred V. Aho, Ravi Sethi, Jeffrey D. Ullman </I>
+	Addison-Wesley, ISBN 0-201-10088-6
+</UL>
+
+<HR>
+
+<ADDRESS>
+<A HREF="/~nrt/">
+<IMG SRC="/~nrt/icons/homepage.gif" ALIGN=right ALT="Back to ">
+NARITA Tomio
+</A> <BR>
+email: nrt@ff.iij4u.or.jp <BR>
+Homepage: http://www.ff.iij4u.or.jp/~nrt/ <BR CLEAR=all>
+</ADDRESS>
+
+</BODY>
+</HTML>

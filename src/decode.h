@@ -1,7 +1,8 @@
 /*
  * decode.h
  *
- * All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+ * All rights reserved. Copyright (C) 1996 by NARITA Tomio
+ * $Id: decode.h,v 1.5 2003/11/13 03:08:19 nrt Exp $
  */
 
 #ifndef __DECODE_H__
@@ -22,6 +23,24 @@
 #define IsKatakana( c )							\
   ( (c) >= 0x21 && (c) <= 0x5f )
 
+#define IsKatakanaByte( c )						\
+  ( (c) >= 0xa1 && (c) <= 0xdf )
+
+#define IsShiftJisByte1( c )						\
+  ( ( (c) >= 0x81 && (c) <= 0x9f ) || ( (c) >= 0xe0 && (c) <= 0xfc ) )
+
+#define IsShiftJisByte2( c )						\
+  ( ( (c) >= 0x40 && (c) <= 0x7e ) || ( (c) >= 0x80 && (c) <= 0xfc ) )
+
+#define IsBig5Byte1( c )						\
+  ( ( (c) >= 0xa1 && (c) <= 0xfe ) )
+
+#define IsBig5Byte2( c )						\
+  ( ( (c) >= 0x40 && (c) <= 0x7e ) || ( (c) >= 0xa1 && (c) <= 0xfe ) )
+
+#define IsEucByte( c )							\
+  ( (c) >= 0xa1 && (c) <= 0xfe )
+
 #define IsGLchar( c )							\
   ( (c) >= SP && (c) <= DEL )
 
@@ -37,7 +56,7 @@
 
 public int ISIDX, SIDX, SHIGH;
 public i_str_t *ISTR;
-public char *STR;
+public byte *STR;
 
 #define GetChar( c )							\
 {									\
@@ -48,11 +67,6 @@ public char *STR;
     break;								\
   }									\
   (c) = STR[ SIDX++ ];							\
-  if( LF == (c) )							\
-    /*									\
-     * BREAK for EXTERNAL LOOP						\
-     */									\
-    break;								\
 }
 
 #define GetCharRet( c )							\
@@ -60,8 +74,13 @@ public char *STR;
   if( SHIGH == SIDX )							\
     return FALSE;							\
   (c) = STR[ SIDX++ ];							\
-  if( LF == (c) )							\
-    return FALSE;							\
+}
+
+#define IncStringIndex()						\
+{									\
+  if( SHIGH != SIDX ){							\
+    SIDX++;								\
+  }									\
 }
 
 #define DecodeAddChar( cset, s, attr )					\
@@ -76,17 +95,23 @@ public char *STR;
 #define SSET		(state->cset[ (int)state->sset ])
 
 public boolean_t binary_decode;
+public boolean_t hz_detection;
+public int decoding_penalty;
 
-public void DecodeAddSpace( char attr );
-public void DecodeAddTab( char attr );
-public void DecodeAddControl( char ch );
+public void DecodeAddLineFeed( byte ch );
+public void DecodeAddSpace( byte attr );
+public void DecodeAddTab( byte attr );
+public void DecodeAddControl( byte ch );
 public void DecodeAddBs();
 
-public void DecodeAddIchar( char charset, ic_t ic, char attr );
+public void DecodeAddIchar( byte charset, ic_t ic, byte attr );
 
-public boolean_t DecodeAddShifted( state_t *state, char ch );
+public boolean_t DecodeAddShifted( state_t *state, byte ch );
 
-public i_str_t *DecodeSimple( char *str, int *shigh );
-public i_str_t *Decode( char codingSystem, char *str, int *shigh );
+public i_str_t *DecodeSimple( i_str_t *istr, byte *str, int *shigh );
+public i_str_t *Decode( i_str_t *istr,
+		       byte codingSystem, byte *str, int *shigh );
+
+public void DecodeInit();
 
 #endif /* __DECODE_H__ */

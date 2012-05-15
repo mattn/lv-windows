@@ -1,7 +1,23 @@
 /*
  * dfa.c
  *
- * All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+ * All rights reserved. Copyright (C) 1996 by NARITA Tomio.
+ * $Id: dfa.c,v 1.4 2003/11/13 03:08:19 nrt Exp $
+ */
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #include <stdio.h>
@@ -16,26 +32,27 @@
 #include <begin.h>
 #include <dfa.h>
 
-/*#define SHOWFUNC*/
+/*
+ * DFA - deterministic finite automaton
+ */
 
 #define DSTATES_SIZE	128
 
-private int dsIdx = 0;
-
 typedef struct DTRAN_T {
-  re_t           *re;
-  int            newState;
+  re_t           *re;			/* input alphabet */
+  int            newState;		/* transition corresponding above */
   struct DTRAN_T *next;
 } dtran_t;
 
 typedef struct {
-  set_t     *state;
-  dtran_t   *dtran;
-  boolean_t final;
-  boolean_t dollar;
+  set_t     *state;			/* elements: temporarily used */
+  dtran_t   *dtran;			/* list of transition table */
+  boolean_t final;			/* final state of DFA */
 } dstates_t;
 
-private re_t *reRoot = NULL;
+private re_t *reRoot = NULL;		/* parsed tree of search pattern */
+
+private int dsIdx = 0;
 private dstates_t dStates[ DSTATES_SIZE ];
 
 #define RE_MATCHED		-1
@@ -163,7 +180,7 @@ private boolean_t LeafIncluded( set_t *set, re_t *re )
   return FALSE;
 }
 
-public char *ReMakeDFA( i_str_t *istr )
+public byte *ReMakeDFA( i_str_t *istr )
 {
   int i, idx, newState = RE_MATCHED;
   set_t *set, *moji, *used, *included;
@@ -171,11 +188,29 @@ public char *ReMakeDFA( i_str_t *istr )
   if( dsIdx > 0 )
     ReFreeDFA();
 
+  /*
+   * Making DFA
+   *
+   * See also:
+   *   ``Compilers - Principles, Techniques, and Tools''
+   *     Alfred V. Aho, Ravi Sethi, Jeffrey D. Ullman
+   *     Addison-Wesley, ISBN 0-201-10088-6
+   */
+
+  /*
+   * Parsing search pattern
+   */
   if( NULL == (reRoot = ReMakeTree( istr )) )
     return reMessage;
 
+  /*
+   * Constructing NFA
+   */
   ReMakeFollowpos( reRoot );
 
+  /*
+   * Constructing DFA
+   */
   set = NULL;
   SetInclude( (set_t **)&set, ReFirstpos( reRoot ) );
 
@@ -185,18 +220,24 @@ public char *ReMakeDFA( i_str_t *istr )
   dsIdx = 1;
 
   for( idx = 0 ; idx < dsIdx ; idx++ ){
+    /*
+     * note that dsIdx is to grow, so every NEW state will be examined.
+     */
     used = NULL;
     for( moji = dStates[ idx ].state ; moji ; moji = moji->next ){
       if( OP_IGETA == moji->re->op )
 	dStates[ idx ].final = TRUE;
       if( TRUE == LeafIncluded( used, moji->re ) )
 	continue;
-      ReInclude( (set_t **)&used, moji->re );
       /*
-       * new character
+       * new character: moji->re
        */
+      ReInclude( (set_t **)&used, moji->re );
       included = NULL;
 
+      /*
+       * include the follow-pos of moji->re to set_t *included
+       */
       if( OP_IGETA == moji->re->op )
 	;
       else if( OP_HAT == moji->re->op || OP_DOLLAR == moji->re->op )
@@ -277,34 +318,29 @@ public char *ReMakeDFA( i_str_t *istr )
 	  }
 	}
       } else {
+	/*
+	 * there is no follow-pos: moji->re is maybe OP_IGETA.
+	 */
 	newState = RE_MATCHED;
       }
       /*
-       * add dtran
+       * add dtran: list of transition table
        */
       dStates[ idx ].dtran = DtranAlloc( moji->re,
 					newState,
 					dStates[ idx ].dtran );
       if( NULL == set )
-	SetFreeAll( included );
+	SetFreeAll( included );	/* not new state */
     }
     SetFreeAll( used );
   }
 
-  for( i = 0 ; i < dsIdx ; i++ ){
-    dtran_t *tran;
-
-    for( tran = dStates[ i ].dtran ; tran ; tran = tran->next ){
-      if( OP_DOLLAR == tran->re->op ){
-	dStates[ i ].dollar = TRUE;
-	break;
-      }
-    }
-    if( NULL == tran )
-      dStates[ i ].dollar = FALSE;
-
+  /*
+   * elements of each state are no longer used.
+   * We only use transition table.
+   */
+  for( i = 0 ; i < dsIdx ; i++ )
     SetFreeAll( dStates[ i ].state );
-  }
 
   if( NULL == dStates[ 0 ].dtran->next
      && OP_SIMPLE_LEAF == dStates[ 0 ].dtran->re->op ){
@@ -325,23 +361,20 @@ private dtran_t *dTran;
 private i_str_t *iStr;
 private int *iPtr;
 
-private int ReDoLeaf( re_t *re, char charset, ic_t c )
+private int ReDoLeaf( re_t *re, byte charset, ic_t c )
 {
-  if( charset < PSEUDO ){
-    return ( re->ic->c == c
-	    && re->ic->charset == charset );
-  } else {
-    return ( re->ic->c == ( 0x00ff & c )
-	    && re->ic->charset == charset );
-  }
+  if( charset < PSEUDO )
+    return re->ic->c == c && re->ic->charset == charset;
+  else
+    return re->ic->c == ( 0x00ff & c ) && re->ic->charset == charset;
 }
 
-private int ReDoSimpleLeaf( re_t *re, char charset, ic_t c )
+private int ReDoSimpleLeaf( re_t *re, byte charset, ic_t c )
 {
-  return ( re->ic->c == c && re->ic->charset == charset );
+  return re->ic->c == c && re->ic->charset == charset;
 }
 
-private int ReDoHat( re_t *re, char charset, ic_t c )
+private int ReDoHat( re_t *re, byte charset, ic_t c )
 {
   if( 0 == *iPtr ){
     (*iPtr)--;
@@ -350,21 +383,24 @@ private int ReDoHat( re_t *re, char charset, ic_t c )
     return FALSE;
 }
 
-private int ReDoDollar( re_t *re, char charset, ic_t c )
+private int ReDoDollar( re_t *re, byte charset, ic_t c )
 {
-  return FALSE;
+  if( LINE_FEED == charset )
+    return TRUE;
+  else
+    return FALSE;
 }
 
-private int ReDoRange( re_t *re, char charset, ic_t c )
+private int ReDoRange( re_t *re, byte charset, ic_t c )
 {
   return re->left->ic->charset == charset
     && re->left->ic->c <= c
       && re->right->ic->c >= c;
 }
 
-private int ReDoComplement( re_t *re, char charset, ic_t c )
+private int ReDoComplement( re_t *re, byte charset, ic_t c )
 {
-  if( TRUE == complementFailed || ReDoLeaf( re, charset, c ) ){
+  if( TRUE == complementFailed || ReDoLeaf( re, charset, c ) || NOSET == charset ){
     if( NULL == dTran->next ||
        ( OP_COMPLEMENT != dTran->next->re->op
 	&& OP_COMPRANGE != dTran->next->re->op ) )
@@ -383,9 +419,9 @@ private int ReDoComplement( re_t *re, char charset, ic_t c )
     return FALSE;
 }
 
-private int ReDoCompRange( re_t *re, char charset, ic_t c )
+private int ReDoCompRange( re_t *re, byte charset, ic_t c )
 {
-  if( TRUE == complementFailed || ReDoRange( re, charset, c ) ){
+  if( TRUE == complementFailed || ReDoRange( re, charset, c ) || NOSET == charset ){
     if( NULL == dTran->next ||
        ( OP_COMPLEMENT != dTran->next->re->op
 	&& OP_COMPRANGE != dTran->next->re->op ) )
@@ -404,32 +440,43 @@ private int ReDoCompRange( re_t *re, char charset, ic_t c )
     return FALSE;
 }
 
-private int ReDoCategory1( re_t *re, char charset, ic_t c )
+private int ReDoCategory1( re_t *re, byte charset, ic_t c )
 {
-  return 1 == IcharWidth( charset, c );
+  if( NOSET == charset )
+    return FALSE;
+  else
+    return 1 == IcharWidth( charset, c );
 }
 
-private int ReDoCategory2( re_t *re, char charset, ic_t c )
+private int ReDoCategory2( re_t *re, byte charset, ic_t c )
 {
-  return 2 == IcharWidth( charset, c );
+  if( NOSET == charset )
+    return FALSE;
+  else
+    return 2 == IcharWidth( charset, c );
 }
 
-private int ReDoCategory3( re_t *re, char charset, ic_t c )
+private int ReDoCategory3( re_t *re, byte charset, ic_t c )
 {
+  /* not used */
   return FALSE;
 }
 
-private int ReDoPeriod( re_t *re, char charset, ic_t c )
+private int ReDoPeriod( re_t *re, byte charset, ic_t c )
 {
-  return TRUE;
+  if( NOSET == charset )
+    return FALSE;
+  else
+    return TRUE;
 }
 
-private int ReDoIgeta( re_t *re, char charset, ic_t c )
+private int ReDoIgeta( re_t *re, byte charset, ic_t c )
 {
+  /* dummy */
   return FALSE;
 }
 
-typedef int (*re_do_func_t)( re_t *, char, ic_t );
+typedef int (*re_do_func_t)( re_t *, byte, ic_t );
 
 private re_do_func_t reDoFuncTable[ OP_LEAF_MAX ] = {
   ReDoLeaf,
@@ -474,18 +521,10 @@ public boolean_t ReRun( i_str_t *istr, int *iptr )
     if( TRUE == dStates[ state ].final ){
       matched = TRUE;
       lastptr = *iPtr;
+      if( NOSET == iStr[ *iPtr ].charset )
+	return TRUE;
     }
     (*iPtr)++;
-    if( NOSET == iStr[ *iPtr ].charset ){
-      if( TRUE == matched ){
-	*iPtr = lastptr;
-	return TRUE;
-      } else if( TRUE == dStates[ state ].dollar ){
-	(*iPtr)--;
-	return TRUE;
-      } else
-	return FALSE;
-    }
     if( 0 > (state = ReDo( state )) ){
       if( TRUE == matched ){
 	*iPtr = lastptr;
@@ -496,7 +535,7 @@ public boolean_t ReRun( i_str_t *istr, int *iptr )
   }
 }
 
-#ifdef SHOWFUNC
+#ifdef REGEXP_TEST
 private void ReIndent( int indent )
 {
   while( indent-- > 0 )
@@ -604,4 +643,4 @@ public void ReShowDFA()
     ReShowdtran( dStates[ i ].dtran );
   }
 }
-#endif /* SHOWFUNC */
+#endif /* REGEXP_TEST */

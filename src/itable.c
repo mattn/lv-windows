@@ -1,7 +1,23 @@
 /*
  * itable.c
  *
- * All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+ * All rights reserved. Copyright (C) 1996 by NARITA Tomio.
+ * $Id: itable.c,v 1.6 2003/11/13 03:08:19 nrt Exp $
+ */
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #include <stdio.h>
@@ -30,6 +46,12 @@ public i_table_t iTable[ I_TABLE_SIZE ] = {
   { ISO8859_7,	'F', FALSE, SET96, 1, 1 },
   { ISO8859_8,	'H', FALSE, SET96, 1, 1 },
   { ISO8859_9,	'M', FALSE, SET96, 1, 1 },
+  { ISO8859_10,	'V', FALSE, SET96, 1, 1 },
+  { ISO8859_11,	'T', FALSE, SET96, 1, 1 },
+  { ISO8859_13,	'Y', FALSE, SET96, 1, 1 },
+  { ISO8859_14,	'_', FALSE, SET96, 1, 1 },
+  { ISO8859_15,	'b', FALSE, SET96, 1, 1 },
+  { ISO8859_16,	'f', FALSE, SET96, 1, 1 },
 
   { C6226,	'@', TRUE,  SET94, 2, 2 },
   { GB2312,	'A', TRUE,  SET94, 2, 2 },
@@ -45,6 +67,9 @@ public i_table_t iTable[ I_TABLE_SIZE ] = {
   { CNS_6,	'L', TRUE,  SET94, 2, 2 },
   { CNS_7,	'M', TRUE,  SET94, 2, 2 },
 
+  { X0213_1,	'O', TRUE,  SET94, 2, 2 },
+  { X0213_2,	'P', TRUE,  SET94, 2, 2 },
+
   { BIG5,	'0', TRUE,  SET94, 2, 2 },	/* non-registered final char */
 
   { UNICODE,	'2', TRUE,  SET94, 2, 2 },
@@ -53,7 +78,8 @@ public i_table_t iTable[ I_TABLE_SIZE ] = {
 
   { SPACE,	'B', FALSE, SET94, 1, 1 },
   { HTAB,	'B', FALSE, SET94, 1, 0 },
-  { CNTRL,	'B', FALSE, SET94, 1, 0 }
+  { CNTRL,	'B', FALSE, SET94, 1, 0 },
+  { LINE_FEED,	'B', FALSE, SET94, 1, 0 }
 };
 
 #define I_TABLE_CACHE_SIZE	4
@@ -74,7 +100,7 @@ public void ItableInit()
     iTableCacheUsed[ i ] = FALSE;
 }
 
-public char ItableLookup( char fin, boolean_t multi, boolean_t set94 )
+public byte ItableLookup( byte fin, boolean_t multi, boolean_t set94 )
 {
   int i;
 
@@ -100,6 +126,7 @@ public char ItableLookup( char fin, boolean_t multi, boolean_t set94 )
       if( iTableCacheIndex >= I_TABLE_CACHE_SIZE )
 	iTableCacheIndex = 0;
       iTableCache[ iTableCacheIndex ] = iTable[ i ];
+      iTableCacheUsed[ iTableCacheIndex ] = TRUE;
 
       return i;
     }
@@ -111,7 +138,7 @@ public char ItableLookup( char fin, boolean_t multi, boolean_t set94 )
   return NOSET;
 }
 
-public int IcharWidth( char charset, ic_t c )
+public int IcharWidth( byte charset, ic_t c )
 {
   if( charset < PSEUDO ){
     switch( charset ){

@@ -1,7 +1,8 @@
 /*
  * re.h
  *
- * All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+ * All rights reserved. Copyright (C) 1996 by NARITA Tomio
+ * $Id: re.h,v 1.3 2003/11/13 03:08:19 nrt Exp $
  */
 
 #ifndef __RE_H__
@@ -66,7 +67,7 @@ typedef struct SET_T {
   struct SET_T *next;
 } set_t;
 
-public char *reMessage;
+public byte *reMessage;
 
 public void SetFreeAll( set_t *set );
 public void ReFreeAll( re_t *re );

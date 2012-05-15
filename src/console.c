@@ -1,7 +1,23 @@
 /*
  * console.c
  *
- * All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+ * All rights reserved. Copyright (C) 1996 by NARITA Tomio.
+ * $Id: console.c,v 1.8 2004/01/05 07:27:46 nrt Exp $
+ */
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #include <stdio.h>
@@ -14,17 +30,18 @@
 #endif /* MSDOS */
 
 #ifdef UNIX
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <unistd.h>
-#ifdef OLDBSD
-#include <sys/ioctl.h>
-#else
+#ifdef HAVE_TERMIOS_H
 #include <termios.h>
-#endif /* OLDBSD */
-#endif /* UNIX */
+#endif /* HAVE_TERMIOS_H */
 
-#ifdef TERMCAP
-#define TGETNUM
-#endif /* TERMCAP */
+#ifdef HAVE_SYS_IOCTL_H
+#include <sys/ioctl.h>
+#endif /* HAVE_SYS_IOCTL_H */
+#endif /* UNIX */
 
 #ifdef TERMINFO
 #include <termio.h>
@@ -40,38 +57,51 @@
 
 #define ANSI_ATTR_LENGTH	8
 
-#ifdef MSDOS
+#if defined( MSDOS ) || defined( WIN32 )
 private char tbuf[ 16 ];
 
+private char *clear_screen		= "\x1b[2J";
 private char *clr_eol			= "\x1b[K";
 private char *delete_line		= "\x1b[M";
 private char *insert_line		= "\x1b[L";
 private char *enter_standout_mode	= "\x1b[7m";
+private char *exit_standout_mode	= "\x1b[m";
 private char *enter_underline_mode	= "\x1b[4m";
+private char *exit_underline_mode	= "\x1b[m";
 private char *enter_bold_mode		= "\x1b[1m";
 private char *exit_attribute_mode	= "\x1b[m";
 private char *cursor_visible		= NULL;
 private char *cursor_invisible		= NULL;
+private char *enter_ca_mode		= NULL;
+private char *exit_ca_mode		= NULL;
+private char *keypad_local		= NULL;
+private char *keypad_xmit		= NULL;
+
+private void tputs( char *cp, int affcnt, int (*outc)(char) )
+{
+  while( *cp )
+    outc( *cp++ );
+}
+
+private int (*putfunc)(char) = ConsolePrint;
 #endif /* MSDOS */
 
 #ifdef UNIX
-#ifdef OLDBSD
-private struct sgttyb ttyOld, ttyNew;
-#else
+
+#ifdef HAVE_TERMIOS_H
 private struct termios ttyOld, ttyNew;
-#endif /* OLDBSD */
-
-#ifdef BSD
-int (*foo)(char) = ConsolePrint;
-#endif /* BSD */
-
-#ifdef SYSV
-#ifdef IRIX
-private int (*foo)(int) = putchar;
 #else
-private int (*foo)(char) = putchar;
-#endif /* IRIX */
-#endif /* SYSV */
+private struct sgttyb ttyOld, ttyNew;
+#endif /* HAVE_TERMIOS_H */
+
+#ifdef putchar
+private int putfunc( int ch )
+{
+  return putchar( ch );
+}
+#else
+private int (*putfunc)(int) = putchar;
+#endif
 
 #endif /* UNIX */
 
@@ -83,6 +113,7 @@ extern char *tgetstr(), *tgoto();
 extern int tgetent(), tgetflag(), tgetnum(), tputs();
 
 private char *cursor_address		= NULL;
+private char *clear_screen		= NULL;
 private char *clr_eol			= NULL;
 private char *insert_line		= NULL;
 private char *delete_line		= NULL;
@@ -94,8 +125,10 @@ private char *enter_bold_mode		= NULL;
 private char *exit_attribute_mode	= NULL;
 private char *cursor_visible		= NULL;
 private char *cursor_invisible		= NULL;
-private char *terminit			= NULL;
-private char *termend			= NULL;
+private char *enter_ca_mode		= NULL;
+private char *exit_ca_mode		= NULL;
+private char *keypad_local		= NULL;
+private char *keypad_xmit		= NULL;
 #endif /* TERMCAP */
 
 public void ConsoleInit()
@@ -121,13 +154,13 @@ private void InterruptIgnoreHandler( int arg )
 }
 #endif /* MSDOS */
 
-private void InterruptHandler( int arg )
+private RETSIGTYPE InterruptHandler( int arg )
 {
   kb_interrupted = TRUE;
 
-#ifndef BSD /* IF NOT DEFINED */
+#ifndef HAVE_SIGVEC
   signal( SIGINT, InterruptHandler );
-#endif /* BSD */
+#endif /* HAVE_SIGVEC */
 }
 
 public void ConsoleEnableInterrupt()
@@ -139,13 +172,13 @@ public void ConsoleEnableInterrupt()
 
 #ifdef UNIX
   signal( SIGTSTP, SIG_IGN );
-#ifdef OLDBSD
-  ttyNew.sg_flags &= ~RAW;
-  ioctl( 0, TIOCSETN, &ttyNew );
-#else
+#ifdef HAVE_TERMIOS_H
   ttyNew.c_lflag |= ISIG;
   tcsetattr( 0, TCSADRAIN, &ttyNew );
-#endif /* OLDBSD */
+#else /* HAVE_TERMIOS_H */
+  ttyNew.sg_flags &= ~RAW;
+  ioctl( 0, TIOCSETN, &ttyNew );
+#endif /* HAVE_TERMIOS_H */
 #endif /* UNIX */
 }
 
@@ -157,13 +190,13 @@ public void ConsoleDisableInterrupt()
 #endif /* MSDOS */
 
 #ifdef UNIX
-#ifdef OLDBSD
-  ttyNew.sg_flags |= RAW;
-  ioctl( 0, TIOCSETN, &ttyNew );
-#else
+#ifdef HAVE_TERMIOS_H
   ttyNew.c_lflag &= ~ISIG;
   tcsetattr( 0, TCSADRAIN, &ttyNew );
-#endif /* OLDBSD */
+#else /* HAVE_TERMIOS_H */
+  ttyNew.sg_flags |= RAW;
+  ioctl( 0, TIOCSETN, &ttyNew );
+#endif /* HAVE_TERMIOS_H */
   signal( SIGTSTP, SIG_DFL );
 #endif /* UNIX */
 }
@@ -171,49 +204,60 @@ public void ConsoleDisableInterrupt()
 public void ConsoleGetWindowSize()
 {
 #ifdef UNIX
+#ifdef WIN32
+  WIDTH  = 80;
+  HEIGHT = 24;
+#else /* WIN32 */
   struct winsize winSize;
 
   ioctl( 0, TIOCGWINSZ, &winSize );
   WIDTH = winSize.ws_col;
   HEIGHT = winSize.ws_row;
   if( 0 >= WIDTH || 0 >= HEIGHT ){
-#ifdef TGETNUM
+#ifdef HAVE_TGETNUM
     WIDTH = tgetnum( "columns" );
     HEIGHT = tgetnum( "lines" );
 #else
     WIDTH = tigetnum( "columns" );
     HEIGHT = tigetnum( "lines" );
-#endif /* TGETNUM */
+#endif /* HAVE_TGETNUM */
     if( 0 >= WIDTH || 0 >= HEIGHT )
       WIDTH = 80, HEIGHT = 24;
   }
+#endif /* WIN32 */
 #endif /* UNIX */
 }
 
 #ifdef UNIX
-private void WindowChangeHandler( int arg )
+private RETSIGTYPE WindowChangeHandler( int arg )
 {
   window_changed = TRUE;
 
   ConsoleGetWindowSize();
 
-#ifdef SYSV
+#ifndef HAVE_SIGVEC
   signal( SIGWINCH, WindowChangeHandler );
-#endif /* SYSV */
+#endif /* HAVE_SIGVEC */
 }
 #endif /* UNIX */
 
 public void ConsoleTermInit()
 {
-#ifdef MSDOS
-  char *ptr;
+  /*
+   * 1. setup terminal capability
+   * 2. retrieve window size
+   * 3. initialize terminal status
+   */
+
+#if defined( MSDOS ) || defined( WIN32 )
+  byte *ptr;
 
 #define ANSI		0
 #define FMRCARD		1
 
   int term = ANSI;
 
-  if( ptr = getenv("TERM") ){
+  if( NULL != (ptr = getenv("TERM")) ){
     if( !strcmp( ptr, "fmr4020" ) ){
       term = FMRCARD;
       WIDTH = 40;
@@ -236,22 +280,42 @@ public void ConsoleTermInit()
     WIDTH  = 80;
     HEIGHT = 24;
   }
+
+  cur_left		= "\x1bK";
+  cur_right		= "\x1bM";
+  cur_up		= "\x1bH";
+  cur_down		= "\x1bP";
+  cur_ppage		= "\x1bI";
+  cur_npage		= "\x1bQ";
+
 #endif /* MSDOS */
 
 #ifdef TERMCAP
-  char *term;
-  char *ptr;
+  byte *term, *ptr;
+#endif
+#ifdef TERMINFO
+  byte *term;
+  int state;
+#endif
 
+#ifdef UNIX
+  int fd = open("/dev/tty", O_RDONLY);
+  dup2(fd, 0);
+  close(fd);
+#endif
+
+#ifdef TERMCAP
   if( NULL == (term = getenv( "TERM" )) )
-    fprintf( stderr, "lv: environment variable TERM is required\n" ), exit( -1 );
+    fprintf( stderr, "lv: environment variable TERM is required\n" );
   if( 0 >= tgetent( entry, term ) )
-    fprintf( stderr, "lv: %s not found in termcap\n", term ), exit( -1 );
+    fprintf( stderr, "lv: %s not found in termcap\n", term );
 
   ConsoleGetWindowSize();
 
   ptr = func;
 
   cursor_address	= tgetstr( "cm", &ptr );
+  clear_screen		= tgetstr( "cl", &ptr );
   clr_eol		= tgetstr( "ce", &ptr );
   insert_line		= tgetstr( "al", &ptr );
   delete_line		= tgetstr( "dl", &ptr );
@@ -263,43 +327,59 @@ public void ConsoleTermInit()
   exit_attribute_mode	= tgetstr( "me", &ptr );
   cursor_visible	= tgetstr( "ve", &ptr );
   cursor_invisible	= tgetstr( "vi", &ptr );
-  terminit		= tgetstr( "ti", &ptr );
-  termend		= tgetstr( "te", &ptr );
+  enter_ca_mode		= tgetstr( "ti", &ptr );
+  exit_ca_mode		= tgetstr( "te", &ptr );
 
-  if( NULL == cursor_address || NULL == clr_eol )
-    fprintf( stderr, "lv: termcap cm, ce are required\n" ), exit( -1 );
+  keypad_local		= tgetstr( "ke", &ptr );
+  keypad_xmit		= tgetstr( "ks", &ptr );
+
+  cur_left		= tgetstr( "kl", &ptr );
+  cur_right		= tgetstr( "kr", &ptr );
+  cur_up		= tgetstr( "ku", &ptr );
+  cur_down		= tgetstr( "kd", &ptr );
+  cur_ppage		= tgetstr( "kP", &ptr );
+  cur_npage		= tgetstr( "kN", &ptr );
+
+  if( NULL == cursor_address || NULL == clear_screen || NULL == clr_eol )
+    fprintf( stderr, "lv: termcap cm, cl, ce are required\n" );
 
   if( NULL == insert_line || NULL == delete_line )
     no_scroll = TRUE;
-
-  if( terminit )
-    tputs( terminit, 1, foo );
+  else
+    no_scroll = FALSE;
 #endif /* TERMCAP */
 
 #ifdef TERMINFO
-  char *term;
-  int state;
 
   if( NULL == (term = getenv( "TERM" )) )
-    fprintf( stderr, "lv: environment variable TERM is required\n" ), exit( -1 );
+    fprintf( stderr, "lv: environment variable TERM is required\n" );
 
   setupterm( term, 1, &state );
   if( 1 != state )
-    fprintf( stderr, "lv: cannot initialize terminal\n" ), exit( -1 );
-
-  def_shell_mode();
+    fprintf( stderr, "lv: cannot initialize terminal\n" );
 
   ConsoleGetWindowSize();
 
-  if( NULL == cursor_address || NULL == clr_eol )
-    fprintf( stderr, "lv: terminfo cursor_address, clr_eol are required\n" ), exit( -1 );
+  cur_left		= key_left;
+  cur_right		= key_right;
+  cur_up		= key_up;
+  cur_down		= key_down;
+  cur_ppage		= key_ppage;
+  cur_npage		= key_npage;
+
+  if( NULL == cursor_address || NULL == clear_screen || NULL == clr_eol )
+    fprintf( stderr, "lv: terminfo cursor_address, clr_eol are required\n" );
 
   if( NULL == insert_line || NULL == delete_line )
     no_scroll = TRUE;
+  else
+    no_scroll = FALSE;
+#endif /* TERMINFO */
 
   if( enter_ca_mode )
-    tputs( enter_ca_mode, 1, foo );
-#endif /* TERMINFO */
+    tputs( enter_ca_mode, 1, putfunc );
+  if( keypad_xmit )
+    tputs( keypad_xmit, 1, putfunc );
 }
 
 public void ConsoleSetUp()
@@ -308,9 +388,7 @@ public void ConsoleSetUp()
   signal( SIGINT, InterruptIgnoreHandler );
 #endif /* MSDOS */
 
-#ifdef UNIX
-
-#ifdef BSD
+#ifdef HAVE_SIGVEC
   struct sigvec sigVec;
 
   sigVec.sv_handler = WindowChangeHandler;
@@ -322,21 +400,15 @@ public void ConsoleSetUp()
   sigVec.sv_mask = sigmask( SIGINT );
   sigVec.sv_flags = SV_INTERRUPT;
   sigvec( SIGINT, &sigVec, NULL );
-#endif /* BSD */
-
-#ifdef SYSV
-  signal( SIGWINCH, WindowChangeHandler );
-  signal( SIGINT, InterruptHandler );
-#endif /* SYSV */
-
-#ifdef OLDBSD
-  ioctl( 0, TIOCGETP, &ttyOld );
-  ttyNew = ttyOld;
-  ttyNew.sg_flags &= ~ECHO;
-  ttyNew.sg_flags |= RAW;
-  ttyNew.sg_flags |= CRMOD;
-  ioctl( 0, TIOCSETN, &ttyNew );
 #else
+# ifdef SIGWINCH
+  signal( SIGWINCH, WindowChangeHandler );
+# endif 
+  signal( SIGINT, InterruptHandler );
+#endif /* HAVE_SIGVEC */
+
+#ifdef UNIX
+#ifdef HAVE_TERMIOS_H
   tcgetattr( 0, &ttyOld );
   ttyNew = ttyOld;
   ttyNew.c_iflag &= ~ISTRIP;
@@ -346,116 +418,87 @@ public void ConsoleSetUp()
   ttyNew.c_lflag &= ~ISIG;
   ttyNew.c_lflag &= ~ICANON;
   ttyNew.c_lflag &= ~ECHO;
+  ttyNew.c_lflag &= ~IEXTEN;
+#ifdef VDISCRD /* IBM AIX */ 
+#define VDISCARD VDISCRD 
+#endif 
+  ttyNew.c_cc[ VDISCARD ] = -1;
   ttyNew.c_cc[ VMIN ] = 1;
   ttyNew.c_cc[ VTIME ] = 0;
   tcsetattr( 0, TCSADRAIN, &ttyNew );
-#endif /* OLDBSD */
+#else
+  ioctl( 0, TIOCGETP, &ttyOld );
+  ttyNew = ttyOld;
+  ttyNew.sg_flags &= ~ECHO;
+  ttyNew.sg_flags |= RAW;
+  ttyNew.sg_flags |= CRMOD;
+  ioctl( 0, TIOCSETN, &ttyNew );
+#endif /* HAVE_TERMIOS_H */
 #endif /* UNIX */
 }
 
 public void ConsoleSetDown()
 {
-#ifdef MSDOS
-  ConsoleSetCur( 0, HEIGHT - 1 );
-  ConsolePrint( CR );
-  ConsolePrint( LF );
-#endif /* MSDOS */
-
 #ifdef UNIX
-#ifdef OLDBSD
-  ioctl( 0, TIOCSETN, &ttyOld );
-#else
+#ifdef HAVE_TERMIOS_H
   tcsetattr( 0, TCSADRAIN, &ttyOld );
-#endif /* OLDBSD */
+#else
+  ioctl( 0, TIOCSETN, &ttyOld );
+#endif /* HAVE_TERMIOS_H */
 #endif /* UNIX */
 
-#ifdef TERMCAP
-  if( termend )
-    tputs( termend, 1, foo );
-  else {
-    ConsoleSetCur( 0, HEIGHT - 1 );
-    ConsolePrint( CR );
-    ConsolePrint( LF );
-  }
-#endif /* TERMCAP */
-
-#ifdef TERMINFO
-  reset_shell_mode();
+  if( keypad_local )
+    tputs( keypad_local, 1, putfunc );
   if( exit_ca_mode )
-    tputs( exit_ca_mode, 1, foo );
+    tputs( exit_ca_mode, 1, putfunc );
   else {
     ConsoleSetCur( 0, HEIGHT - 1 );
     ConsolePrint( CR );
     ConsolePrint( LF );
   }
-#endif /* TERMINFO */
 }
 
 public void ConsoleShellEscape()
 {
-#ifdef MSDOS
-  ConsoleSetCur( 0, HEIGHT - 1 );
-#endif /* MSDOS */
-
 #ifdef UNIX
-#ifdef OLDBSD
-  ioctl( 0, TIOCSETN, &ttyOld );
-#else
+#ifdef HAVE_TERMIOS_H
   tcsetattr( 0, TCSADRAIN, &ttyOld );
-#endif /* OLDBSD */
+#else
+  ioctl( 0, TIOCSETN, &ttyOld );
+#endif /* HAVE_TERMIOS_H */
 #endif /* UNIX */
 
-#ifdef TERMCAP
-  if( termend )
-    tputs( termend, 1, foo );
-  else
-    ConsoleSetCur( 0, HEIGHT - 1 );
-#endif /* TERMCAP */
-
-#ifdef TERMINFO
-  reset_shell_mode();
+  if( keypad_local )
+    tputs( keypad_local, 1, putfunc );
   if( exit_ca_mode )
-    tputs( exit_ca_mode, 1, foo );
+    tputs( exit_ca_mode, 1, putfunc );
   else
     ConsoleSetCur( 0, HEIGHT - 1 );
-#endif /* TERMINFO */
 
   ConsoleFlush();
 }
 
 public void ConsoleReturnToProgram()
 {
-#ifdef TERMCAP
-  if( terminit )
-    tputs( terminit, 1, foo );
-#endif /* TERMCAP */
-
-#ifdef TERMINFO
+  if( keypad_xmit )
+    tputs( keypad_xmit, 1, putfunc );
   if( enter_ca_mode )
-    tputs( enter_ca_mode, 1, foo );
-#endif /* TERMINFO */
+    tputs( enter_ca_mode, 1, putfunc );
 
 #ifdef UNIX
-#ifdef OLDBSD
-  ioctl( 0, TIOCSETN, &ttyNew );
-#else
+#ifdef HAVE_TERMIOS_H 
   tcsetattr( 0, TCSADRAIN, &ttyNew );
-#endif /* OLDBSD */
+#else
+  ioctl( 0, TIOCSETN, &ttyNew );
+#endif /* HAVE_TERMIOS_H */
 #endif /* UNIX */
 }
 
 public void ConsoleSuspend()
 {
-#ifdef BSD
-  int pgrp;
-
-  ioctl( 0, TIOCGPGRP, &pgrp );
-  killpg( pgrp, SIGSTOP );
-#endif /* BSD */
-
-#ifdef SYSV
-  kill( - getpgrp(), SIGSTOP );
-#endif /* SYSV */
+#ifndef MSDOS /* if NOT defind */
+  kill(0, SIGSTOP);	/*to pgrp*/
+#endif
 }
 
 public int ConsoleGetChar()
@@ -465,7 +508,7 @@ public int ConsoleGetChar()
 #endif /* MSDOS */
 
 #ifdef UNIX
-  char buf;
+  byte buf;
 
   if( 0 > read( 0, &buf, 1 ) )
     return EOF;
@@ -474,10 +517,24 @@ public int ConsoleGetChar()
 #endif /* UNIX */
 }
 
-public int ConsolePrint( char c )
+#ifdef MSDOS
+union REGS regs;
+#endif /* MSDOS */
+
+public int ConsolePrint( byte c )
 {
 #ifdef MSDOS
-  bdos( 0x06, 0xff != c ? c : 0, 0 );
+  /*
+   * fast console output, but remember that you cannot use lv
+   * through remote terminals, for example AUX (RS232C).
+   * I changed this code for FreeDOS. Because function code No.6
+   * with Int 21h on FreeDOS (Alpha 5) doesn't seem to work correctly.
+   */
+  regs.h.al = c;
+  return int86( 0x29, &regs, &regs );
+/*
+  return (int)bdos( 0x06, 0xff != c ? c : 0, 0 );
+*/
 #endif /* MSDOS */
 
 #ifdef UNIX
@@ -485,22 +542,16 @@ public int ConsolePrint( char c )
 #endif /* UNIX */
 }
 
-public void ConsolePrints( char *str )
+public void ConsolePrints( byte *str )
 {
-#ifdef MSDOS
   while( *str )
     ConsolePrint( *str++ );
-#endif /* MSDOS */
-
-#ifdef UNIX
-  printf( "%s", str );
-#endif /* UNIX */
 }
 
 public void ConsolePrintsStr( str_t *str, int length )
 {
   int i;
-  char attr, lastAttr;
+  byte attr, lastAttr;
 
   attr = lastAttr = ATTR_NULL;
   for( i = 0 ; i < length ; i++ ){
@@ -510,7 +561,7 @@ public void ConsolePrintsStr( str_t *str, int length )
     lastAttr = attr;
     ConsolePrint( 0xff & str[ i ] );
   }
-  if( NULL != attr )
+  if( 0 != attr )
     ConsoleSetAttribute( 0 );
 }
 
@@ -523,103 +574,68 @@ public void ConsoleFlush()
 
 public void ConsoleSetCur( int x, int y )
 {
-#ifdef MSDOS
+#if defined( MSDOS ) || defined( WIN32 )
   sprintf( tbuf, "\x1b[%d;%dH", y + 1, x + 1 );
   ConsolePrints( tbuf );
 #endif /* MSDOS */
 
 #ifdef TERMCAP
-  tputs( tgoto( cursor_address, x, y ), 1, foo );
+  tputs( tgoto( cursor_address, x, y ), 1, putfunc );
 #endif /* TERMCAP */
 
 #ifdef TERMINFO
-  tputs( tparm( cursor_address, y, x ), 1, foo );
+  tputs( tparm( cursor_address, y, x ), 1, putfunc );
 #endif /* TERMINFO */
 }
 
 public void ConsoleOnCur()
 {
-#ifdef MSDOS
   if( cursor_visible )
-    ConsolePrints( cursor_visible );
-#endif /* MSDOS */
-
-#ifdef UNIX
-  if( cursor_visible )
-    tputs( cursor_visible, 1, foo );
-#endif /* UNIX */
+    tputs( cursor_visible, 1, putfunc );
 }
 
 public void ConsoleOffCur()
 {
-#ifdef MSDOS
   if( cursor_invisible )
-    ConsolePrints( cursor_invisible );
-#endif /* MSDOS */
+    tputs( cursor_invisible, 1, putfunc );
+}
 
-#ifdef UNIX
-  if( cursor_invisible )
-    tputs( cursor_invisible, 1, foo );
-#endif /* UNIX */
+public void ConsoleClearScreen()
+{
+  tputs( clear_screen, 1, putfunc );
 }
 
 public void ConsoleClearRight()
 {
-#ifdef MSDOS
-  ConsolePrints( clr_eol );
-#endif /* MSDOS */
-
-#ifdef UNIX
-  tputs( clr_eol, 1, foo );
-#endif /* UNIX */
+  tputs( clr_eol, 1, putfunc );
 }
 
 public void ConsoleGoAhead()
 {
-#ifdef MSDOS
   ConsolePrint( 0x0d );
-#endif /* MSDOS */
-
-#ifdef UNIX
-  putchar( 0x0d );
-#endif /* UNIX */
 }
 
 public void ConsoleScrollUp()
 {
-#ifdef MSDOS
   if( delete_line )
-    ConsolePrints( delete_line );
-#endif /* MSDOS */
-
-#ifdef UNIX
-  if( delete_line )
-    tputs( delete_line, 1, foo );
-#endif /* UNIX */
+    tputs( delete_line, 1, putfunc );
 }
 
 public void ConsoleScrollDown()
 {
-#ifdef MSDOS
   if( insert_line )
-    ConsolePrints( insert_line );
-#endif /* MSDOS */
-
-#ifdef UNIX
-  if( insert_line )
-    tputs( insert_line, 1, foo );
-#endif /* UNIX */
+    tputs( insert_line, 1, putfunc );
 }
 
-private char prevAttr = NULL;
+private byte prevAttr = 0;
 
-public void ConsoleSetAttribute( char attr )
+public void ConsoleSetAttribute( byte attr )
 {
 #ifndef MSDOS /* IF NOT DEFINED */
   if( TRUE == allow_ansi_esc ){
 #endif /* MSDOS */
     ConsolePrints( "\x1b[0" );
-    if( NULL != attr ){
+    if( 0 != attr ){
       if( ATTR_STANDOUT & attr ){
 	ConsolePrint( ';' );
 	ConsolePrints( ansi_standout );
@@ -661,23 +677,23 @@ public void ConsoleSetAttribute( char attr )
      */
     if( ( ATTR_HILIGHT & prevAttr ) && 0 == ( ATTR_HILIGHT & attr ) )
       if( exit_attribute_mode )
-	tputs( exit_attribute_mode, 1, foo );
+	tputs( exit_attribute_mode, 1, putfunc );
     if( ( ATTR_UNDERLINE & prevAttr ) && 0 == ( ATTR_UNDERLINE & attr ) )
       if( exit_underline_mode )
-	tputs( exit_underline_mode, 1, foo );
+	tputs( exit_underline_mode, 1, putfunc );
     if( ( ATTR_STANDOUT & prevAttr ) && 0 == ( ATTR_STANDOUT & attr ) )
       if( exit_standout_mode )
-	tputs( exit_standout_mode, 1, foo );
+	tputs( exit_standout_mode, 1, putfunc );
 
     if( ATTR_HILIGHT & attr )
       if( enter_bold_mode )
-	tputs( enter_bold_mode, 1, foo );
+	tputs( enter_bold_mode, 1, putfunc );
     if( ATTR_UNDERLINE & attr )
       if( enter_underline_mode )
-	tputs( enter_underline_mode, 1, foo );
+	tputs( enter_underline_mode, 1, putfunc );
     if( ATTR_STANDOUT & attr )
       if( enter_standout_mode )
-	tputs( enter_standout_mode, 1, foo );
+	tputs( enter_standout_mode, 1, putfunc );
   }
   prevAttr = attr;
 #endif /* MSDOS */

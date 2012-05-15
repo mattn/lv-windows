@@ -1,42 +1,50 @@
 /*
  * iso2jp.c
  *
- * All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+ * All rights reserved. Copyright (C) 1996 by NARITA Tomio.
+ * $Id: iso2jp.c,v 1.5 2004/01/05 07:23:29 nrt Exp $
+ */
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #include <stdio.h>
 
 #include <import.h>
 #include <encode.h>
-#include <big5.h>
 #include <unimap.h>
+#include <big5.h>
 #include <begin.h>
 #include <iso2jp.h>
 
 /*
- * iso-2022-jp, iso-8859-*
+ * iso-2022-jp
  *
- * all 94charsets use G0, and all 96charsets use G2 with single shift,
- * and one pre-designated 8bit charset uses G1.
+ * all 94charsets use G0, and all 96charsets use G2 with single shift.
  */
 public void EncodeISO2022jp( i_str_t *istr, int head, int tail,
-			    char codingSystem, boolean_t binary )
+			    byte codingSystem, boolean_t binary )
 {
   int idx, attr;
   ic_t ic;
-  char cset, lastCset, lastCsetG0, lastCsetG2, csetG1 = ASCII;
-  boolean_t lastSet94, set94, bit8;
+  byte cset, lastCset, lastCsetG0, lastCsetG2;
+  boolean_t lastSet94, set94, bit8 = FALSE;
 
-  attr = NULL;
+  attr = 0;
   lastCset = lastCsetG0 = lastCsetG2 = ASCII;
   lastSet94 = TRUE;
-
-  if( TRUE == cTable[ (int)codingSystem ].bit8 ){
-    bit8 = TRUE;
-    csetG1 = cTable[ (int)codingSystem ].state.cset[ G1 ];
-  } else {
-    bit8 = FALSE;
-  }
 
   for( idx = head ; idx < tail ; idx++ ){
     cset = istr[ idx ].charset;
@@ -46,18 +54,9 @@ public void EncodeISO2022jp( i_str_t *istr, int head, int tail,
       ic = BIG5toCNS( ic, &cset );
 #ifndef MSDOS /* IF NOT DEFINED */
     else if( UNICODE == cset )
-      ic = UNItoJIS( ic, &cset );
+      ic = UNItoJapanese( ic, &cset );
 #endif /* MSDOS */
     set94 = iTable[ (int)cset ].set94;
-    if( TRUE == bit8 && ASCII != cset && csetG1 == cset ){
-      if( TRUE == iTable[ (int)cset ].multi ){
-	EncodeAddChar( attr, 0x80 | MakeByte1( ic ) );
-	EncodeAddChar( attr, 0x80 | MakeByte2( ic ) );
-      } else {
-	EncodeAddChar( attr, 0x80 | ic );
-      }
-      continue;
-    }
     if( lastSet94 != set94 ){
       if( TRUE == set94 ){
 	lastCsetG2 = lastCset;

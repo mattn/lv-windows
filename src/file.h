@@ -1,7 +1,8 @@
 /*
  * file.h
  *
- * All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+ * All rights reserved. Copyright (C) 1996 by NARITA Tomio
+ * $Id: file.h,v 1.8 2004/01/05 07:30:15 nrt Exp $
  */
 
 #ifndef __FILE_H__
@@ -12,16 +13,18 @@
 #include <itable.h>
 #include <ctable.h>
 #include <str.h>
+#include <stream.h>
 
-#define LINE_SIZE	64U		/* physical lines per logical line */
-#define PAGE_SIZE	32U		/* lines per page */
+#define LV_PAGE_SIZE	32U		/* lines per page */
 
 #ifdef MSDOS
 #define BLOCK_SIZE	2		/* segments on memory */
-#define SLOT_SIZE	2047U		/* file location pointers */
+#define SLOT_SIZE	1024U		/* file location pointers */
+#define FRAME_SIZE	2U
 #else
 #define BLOCK_SIZE	4		/* segments on memory */
 #define SLOT_SIZE	16384U		/* file location pointers */
+#define FRAME_SIZE	4096U
 #endif /* MSDOS */
 
 typedef struct {
@@ -39,7 +42,7 @@ typedef struct {
 typedef struct {
   unsigned int	segment;
   int		lines;			/* logical line number */
-  line_t	line[ PAGE_SIZE ];
+  line_t	line[ LV_PAGE_SIZE ];
 } page_t;
 
 typedef struct {
@@ -63,23 +66,23 @@ typedef struct {
 } find_t;
 
 typedef struct {
-/*
-  state_t	state;
-*/
-  long		ptr;
-} slot_t;
-
-typedef struct {
-  char		*fileName;
+  byte		*fileName;
+  i_str_t	*fileNameI18N;
+  int		fileNameLength;
   FILE		*fp;
   FILE		*sp;
-  int		inputCodingSystem;
-  int		outputCodingSystem;
-  int		keyboardCodingSystem;
+  int		pid;
+  byte		inputCodingSystem;
+  byte		outputCodingSystem;
+  byte		keyboardCodingSystem;
+  byte		pathnameCodingSystem;
+  byte		defaultCodingSystem;
+  byte		dummy;
   int		width;
   int		height;
   unsigned int	lastSegment;
-  unsigned int	totalLines;
+  unsigned int	lastFrame;
+  unsigned long	totalLines;
   long		lastPtr;
   boolean_t	done;
   boolean_t	eof;
@@ -91,7 +94,7 @@ typedef struct {
   screen_t	screen;
   boolean_t	used[ BLOCK_SIZE ];
   page_t	page[ BLOCK_SIZE ];
-  slot_t	slot[ SLOT_SIZE ];
+  long		*slot[ FRAME_SIZE ];
 } file_t;
 
 #ifdef MSDOS
@@ -104,28 +107,34 @@ typedef struct {
 #endif /* far */
 #endif /* MSDOS */
 
-#define Segment( line )		( (line) / PAGE_SIZE )
-#define Offset( line )		( (line) % PAGE_SIZE )
+#define Segment( line )		( (line) / LV_PAGE_SIZE )
+#define Offset( line )		( (line) % LV_PAGE_SIZE )
 #define Block( segment )	( (segment) % BLOCK_SIZE )
+#define Slot( segment )		( (segment) % SLOT_SIZE )
+#define Frame( segment )	( (segment) / SLOT_SIZE )
 
-public boolean_t immediate_print;
+public void FileFreeLine( file_t *f );
+public byte *FileLoadLine( file_t *f, int *length, boolean_t *simple );
 
-public char load_str[ STR_SIZE ];
+public file_t *FileAttach( byte *fileName, stream_t *st,
+			  int width, int height,
+			  byte inputCodingSystem,
+			  byte outputCodingSystem,
+			  byte keyboardCodingSystem,
+			  byte pathnameCodingSystem,
+			  byte defaultCodingSystem );
+public void FilePreload( file_t *f );
 
-public boolean_t FileLoadLine( file_t *f, int *length );
+public boolean_t FileFree( file_t *f );
+public boolean_t FileDetach( file_t *f );
 
-public file_t *FileOpen( char *fileName, FILE *fp, FILE *sp,
-			int width, int height,
-			char inputCodingSystem,
-			char outputCodingSystem,
-			char keyboardCodingSystem );
-
-public boolean_t FileClose( file_t *f );
 public boolean_t FileStretch( file_t *f, unsigned int target );
 public boolean_t FileSeek( file_t *f, unsigned int segment );
 
-public void FileFreeHead( file_t *f );
 public void FileRefresh( file_t *f );
-public char *FileStatus( file_t *f );
+public byte *FileStatus( file_t *f );
+public byte *FileName( file_t *f );
+
+public void FileInit();
 
 #endif /* __FILE_H__ */

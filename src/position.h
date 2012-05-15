@@ -1,7 +1,8 @@
 /*
  * position.h
  *
- * All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+ * All rights reserved. Copyright (C) 1996 by NARITA Tomio
+ * $Id: position.h,v 1.5 2004/01/05 07:30:15 nrt Exp $
  */
 
 #ifndef __POSITION_H__
@@ -12,10 +13,10 @@
 
 #define PositionGet( pos, s, b, o, p )					\
 {									\
-  (seg) = (pos).s;							\
-  (blk) = (pos).b;							\
-  (off) = (pos).o;							\
-  (phy) = (pos).p;							\
+  (s) = (pos).seg;							\
+  (b) = (pos).blk;							\
+  (o) = (pos).off;							\
+  (p) = (pos).phy;							\
 }
 
 #define PositionSet( pos, s, b, o, p )					\
@@ -46,10 +47,11 @@
 	 */								\
 	break;								\
       } else {								\
-	if( FALSE == FetchLine( (f), (seg) - 1, PAGE_SIZE - 1 ) ){	\
+	if( FALSE == FetchLine( (f), (seg) - 1, LV_PAGE_SIZE - 1 ) ){	\
 	  /*								\
 	   * memory shortage?						\
 	   */								\
+	  fprintf( stderr, "memory shortage?\n" );			\
 	  FatalErrorOccurred();						\
         } else {		/* successfully loaded */		\
 	  (seg)--;							\

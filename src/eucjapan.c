@@ -1,22 +1,38 @@
 /*
  * eucjapan.c
  *
- * All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+ * All rights reserved. Copyright (C) 1996 by NARITA Tomio.
+ * $Id: eucjapan.c,v 1.3 2003/11/13 03:08:19 nrt Exp $
+ */
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #include <import.h>
 #include <encode.h>
-#include <big5.h>
 #include <unimap.h>
+#include <big5.h>
 #include <begin.h>
 #include <eucjapan.h>
 
 public void EncodeEUCjp( i_str_t *istr, int head, int tail,
-			char codingSystem, boolean_t binary )
+			byte codingSystem, boolean_t binary )
 {
   int idx, attr;
   ic_t ic;
-  char cset, g0, g1, g2, g3;
+  byte cset, g0, g1, g2, g3;
 
   g0 = cTable[ (int)codingSystem ].state.cset[ G0 ];
   g1 = cTable[ (int)codingSystem ].state.cset[ G1 ];

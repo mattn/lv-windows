@@ -1,0 +1,1041 @@
+<!-- ------------------------------------------------------------
+	$Id: relnote.html,v 1.34 2004/01/16 12:25:55 nrt Exp $
+	Copyright: NARITA Tomio
+------------------------------------------------------------ -->
+<HTML>
+<!-- ------------------------------------------------------------ -->
+<HEAD>
+<TITLE> LV Release Note </TITLE>
+</HEAD>
+<!-- ------------------------------------------------------------ -->
+<BODY BGCOLOR=#ffffe0 TEXT=#c00090 LINK=#0090c0 VLINK=#e000a8 ALINK=#00c090>
+
+<P ALIGN=right>
+<FONT SIZE=-2>All rights reserved. Copyright (C) 1996-2004 by NARITA Tomio</FONT>
+
+<HR>
+
+<P ALIGN=left>
+
+<H1> <IMG SRC="/~nrt/icons/redball.gif" ALT="">
+LV Release Note
+</H1>
+
+<HR>
+
+<CENTER>
+Back to <A HREF="index.html">LV Homepage</A>.
+</CENTER>
+
+<HR WIDTH="50%">
+
+<UL>
+<li> ver 4.51 (Jan.16th,2004) <br>
+	<ul>
+	<li> fixed keyboard-interrupt handling while reloading a file to avoid segmentation fault.
+		(pointed out by Masanori GOTO &lt;gotom@debian.or.jp&gt;)
+	<li> modified definitions of boolean_t, PAGE_SIZE, VDISCARD, and autoconf for libcurses for AIX.
+		(pointed out by SHIOTA Shoichi &lt;Shoichi.Shiota@lightwell.co.jp&gt;)
+	<li> omitted to specify owner and group to install command,
+		and omitted include langinfo.h when HAVE_LANGINFO_CODESET is not defined, for Max OS X.
+		(pointed out by Koki NAKASHIRO &lt;nakasiro@sdl.hitachi.co.jp&gt;)
+	</ul>
+<LI> ver 4.50 (Nov.14th,2003) <BR>
+	<ul>
+	<li> fully incorporated patches from 4.49.5.a to 4.49.5.f by Tomohiro KUBOTA &lt;kubota@debian.org&gt;.<br>
+		very thanks to KUBOTA san and Debian activities.
+	<li> added polling function for regular files with slightly modified patch from Pawel S. Veselov &lt;vps@manticore.2y.net&gt;.
+	<li> corrected Polish entry in hello.sample (pointed out by Michal Szymanski &lt;msz@astrouw.edu.pl&gt;)
+	<li> enabled itable cache.
+	<li> Big5 to Unicode mapping didn't work at all (fixed offset of coding system table) <br>
+		(See http://lists.debian.or.jp/debian-devel/200311/msg00006.html)
+	<li> changed configure.in to check locale.h, setlocale, nl_langinfo(CODESET)
+	<li> corrected copyright year of each file to the first year
+	<li> fixed editor call not to return by SIGINT unexpectedly
+	</ul>
+<p>
+<LI> ver 4.49.5.f (Oct.26th,2003) (Tomohiro KUBOTA test version)<BR>
+	<UL>
+	<LI> Initialize file-&gt;used[] in FileAttach() in file.c to
+	     avoid segfault in lgrep.
+	</UL>
+<p>
+<LI> ver 4.49.5.e (Sep.19th,2003) (Tomohiro KUBOTA test version)<BR>
+	<UL>
+	<LI> a patch from Toshinori Numata &lt;numa@sysrap.cs.fujitsu.co.jp&gt;
+	     to fix segfault in invalid locale, to support locale names
+	     without country part, and to support non-GLIBC-type encoding
+	     names.
+	</UL>
+<p>
+<LI> ver 4.49.5.d (Aug.30th,2003) (Tomohiro KUBOTA test version)<BR>
+	<UL>
+	<LI> manpage fix: error occured with apropus and man -k.
+	     (See http://bugs.debian.org/119125)
+	<LI> Doesn't stop and try to output even when $TERM is not valid.
+	     (See http://lists.debian.or.jp/debian-users/200110/msg00342.html)
+	<LI> use long instead of int for i_str.
+	<LI> Checks $EDITOR and $VISUAL variables when invoking an editor.
+	</UL>
+<p>
+<LI> ver 4.49.5.c (Aug.30th,2003) (Tomohiro KUBOTA test version)<BR>
+	<UL>
+	<LI> -D option now specifies default (fall-back) coding
+		system, not default EUC coding system.  This means
+		that -D coding system is used not only for determination
+		of EUC coding systems but also determination of other
+		coding systems.
+	<LI> Input coding detection improved.
+		The detection is done as following: At first,
+		it is checked whether the input coding system is
+		UTF-8 compliant or not.  Since UTF-8 is a relatively
+		strict coding system, it is not likely that non-UTF-8
+		file is misdetected as UTF-8.  If the input coding
+		is not UTF-8 compliant, then, other multibyte coding
+		systems are checked only when LC_CTYPE locale belongs
+		to east Asia.  In this stage, it is clear that the
+		input coding system is not multibyte.  Thus, check
+		if the default (fall-back) coding system and adopt
+		it if it is not multibyte.  If the current LC_CTYPE
+		locale is 8bit, adopt it.  At last, guess from
+		language/country part of LC_CTYPE locale.
+	<LI> Output coding detection based on LC_CTYPE locale.
+	</UL>
+<P>
+<LI> ver 4.49.5.b (Aug.30th,2003) (Tomohiro KUBOTA test version)<BR>
+	<UL>
+	<LI> Updated KSX1001 <-> Unicode mapping table.
+	</UL>
+<P>
+<LI> ver 4.49.5.a (Aug.30th,2003) (Tomohiro KUBOTA test version)<BR>
+	<UL>
+	<LI> Added ISO-8859-10,11,13,14,15,16.
+	<LI> Changed coding system names for '=' key because they
+	     were confusing because they are different from 
+	     naming for command line options.  I adopted full names
+	     because I could not find any reason the names have to
+	     be short.
+	</UL>
+<P>
+<LI> ver 4.49.5 (May.10th,2003) <BR>
+	<UL>
+	<LI> Don't read .lv located at the current directory, except for MSDOS.  This fix prevent possible local root exploit using config files (CAN-2003-0188).
+	</UL>
+<P>
+<LI> ver 4.49.4 (Aug.24th,2000) <BR>
+	<UL>
+	<LI> fixed a bug of non-regular file loading (file.c).
+	<LI> added option -i to enable casefold search and +i to disable it.
+	<LI> added keybind 'w' to 'previous line'.
+	<LI> modified input routine to accept DEL as delete key. Thanks John.
+	<LI> modified console code to care putchar() as a macro. Thanks Kenji.
+	<LI> renamed some variables for clarity.
+	<LI> added JIS X 0213-2000 Plane 1,2 as independent charsets of JIS X 0208.
+	<LI> I heard that KS C 5601 has changed its name to KS X 1001.
+	</UL>
+<P>
+<LI> ver 4.49.3 (Nov.2nd,1999) <BR>
+	<UL>
+	<LI> modified import.h to remove needless #ifndef.
+	<LI> added key bindings for PageUp/PageDown to move prev/next page,
+		and changed Left/Right bindings to moving prev/next half page.
+	<LI> added bzip2 support for *.bz2 files with bzcat(1).
+	<LI> modified ConfFilename() to refer environment variable MAN_PN
+		and show that instead of "(stdin)"
+		when man(1) passes the variable to lv.
+	<LI> modified iso-8859-7/Unicode mapping table.
+	<LI> fixed a bug that standout sequences remaine when
+		you search a string before suspend/edit,
+		and after that you immediately cancel the search.
+	<LI> fixed a bug again, lv blocks stdin stream by itself,
+		before the first page cache is filled
+		(once fixed in ver 4.2beta2).
+	</UL>
+<P>
+<LI> ver 4.49.2 (Sep.14th,1999) <BR>
+	<UL>
+	<LI> added run-time command '=' that acts equally as 'C-g'.
+	<LI> changed LV_FILES_MAX constant to LV_FILES_UNLIMITED for UNIX version.
+	</UL>
+<P>
+<LI> ver 4.49.1 (Jul.25th,1999) <BR>
+	Translation of utf-8 and utf-7 into iso-8859-* was mishandled.
+	Since iso-8859-* are ISO 2022 8bit system and
+	output routine of that was shared with iso-2022-jp inside lv,
+	so Unicode was converted into JIS Japanese codeset by mistake.
+	Furthermore, some glyphs in iso-8859-2..9 that iso-8859-1 also contains
+	were incorrectly mapped into iso-8859-1.
+	<P>
+	Then I changed following points:
+	<UL>
+	<LI> Rebuilt iso-8859-* mapping table.
+	<LI> Separated iso-8859-* encoding routine from iso-2022-jp.
+	</UL>
+	<P>
+	This bug report was posted by &lt;elad@tsur1.dhis.org&gt;.
+<P>
+<LI> ver 4.48.2 (Jun.24th,1999) <BR>
+	次の点を修正しました.
+	<UL>
+	<LI> grepモードで起動するオプション-gを新設しました.
+	<LI> オプション-qの意味を逆転させました.
+		ただし-qはMSDOS版でしか意味を持ちません.
+	<LI> ドキュメントのKnown bugsを削除しました.
+		実態を反映していませんでした.
+	<LI> リファレンスが古くなっていたので新しい内容にしました.
+	</UL>
+<P>
+<LI> ver 4.48.1 (Jun.15th,1999) <BR>
+	次の点を修正しました.
+	<UL>
+	<LI> FileClose() 周りにバグがありました.
+		FileOpen(), FileClose() は名前が動作を反映していなかったので,
+		FileAttach(), FileDetach() に名前を変更しました.
+	<LI> 複数のファイルを指定して lgrep として動作する時,
+		これまで途中のファイルをオープンできないと
+		exit() してしまっていましたが,
+		次のファイルに進むように改善しました.
+	<LI> ISO 2022 デコーダーがエラー状態の時に生成するゴミが
+		C0集合に乗らないように改善しました.
+	</UL>
+	まだ安定とは思えないため, マイナーバージョンとします.
+<P>
+<LI> ver 4.48 (Jun.7th,1999) <BR>
+	FileOpen() 周りにバグがありました.
+<P>
+<LI> ver 4.47 (Jun.7th,1999) <BR>
+	次の点を修正しました.
+	<UL>
+	<LI> 論理行の最大長を8192バイトに変更しました
+		(何バイトでもいいのですが,
+		それなりに負荷もかかるので, この値).
+		内部的には, 論理行の『通常の最大値』は 1024 バイトとして,
+		それを越える論理行だけを『特別扱い』することにしました.
+	<LI> これに伴ない,
+		FileLoadLine(), IstrAlloc(), Decode(), Encode() などを
+		STR_SIZE 以上の長さが処理できるように修正しました
+	<LI> CRのみの改行 (Macの改行?) を認識するようにしました.
+	<LI> これに伴ない,
+		『改行』を文字コードとして保持するように変更しました.
+		これにより,
+		フィルタとして動作した場合に,
+		STR_SIZEをまたぐ『強制改行』が,
+		パイプに出力されないようになりました.
+		(しかし, 境界をまたぐ符号は従来通り分断されてしまいます ;-<).
+	<LI> エンコーディングスペースを, 『文字数の4倍』に広げました.
+		固定長スペースで処理できない場合に,
+		適宜, malloc() でメモリを確保するようにしました.
+	<LI> istr.c (可変長 zone allocation) を大幅に変更しました.
+	<LI> フィルタとして動作する場合,
+		標準入力をファイルとして複製しないようにしました.
+	<LI> オプション -p を廃止しました.
+	</UL>
+	lvのベース部分に多くの変更を加えたため,
+	ちょっとバギーという気がします.
+<P>
+<LI> ver 4.46 <BR>
+	バージョンを1個飛ばします.
+<P>
+<LI> ver 4.45 (May.28th,1999) <BR>
+	五十嵐さん&lt;igarashi@ueda.info.waseda.ac.jp&gt;のご指摘で次の2点を修正しました.
+	<UL>
+	<LI> 論理行の最大バイト数に近い長さの行を処理すると,
+		本来, 出力されるべき行末の一部分が削除される
+		(utf-8をutf-8で出力する場合など)バグを修正.
+	<LI> 一行が1024バイトを越えるケースは意外と多いようなので,
+		論理行の最大バイト数を 1023 から 2047 に変更した
+		(メモリの消費量が突然, 倍になる心配はありません).
+	</UL>
+<P>
+<LI> ver 4.44 (May.24th,1999) <BR>
+	次の点を修正しました.
+	<UL>
+	<LI> これまで複数のファイルを指定した場合でも,
+		1番目のファイルが開けなかったらならば終了していたが,
+		そうではなく次のファイルを開くようにした.
+	<LI> 複数のファイルが指定された場合,
+		最初から全部のファイルを開くのではなく,
+		開く必要が出てから開くようにした.
+	</UL>
+<P>
+<LI> ver 4.43 (May.22nd,1999) <BR>
+	後藤さん&lt;gotom@cs.titech.ac.jp&gt; のご指摘で次の点を修正しました.
+	<UL>
+	<LI> Debian GNU/Linux で configure すると画面制御のライブラリがリンクされない.
+	</UL>
+<P>
+<LI> ver 4.42 (May.14th,1999) <BR>
+	よしださん &lt;yoshidam@inse.co.jp&gt; のご指摘で次の点を修正しました.
+	<UL>
+	<LI> autoconfに関連してconsole.cのincludeの切り分けを変更した.
+	<LI> フィルタとして動作する時, /dev/tty を open しないようにした.
+	</UL>
+<P>
+<LI> ver 4.41 (May.7th,1999) <BR>
+	<UL>
+	<LI> 後藤さん&lt;gotom@cs.titech.ac.jp&gt;
+		とのディスカッションのすえ,
+		この版から Copyrightを
+		GNU General Public License に変更しました.
+		very thanks!
+	<LI> ドキュメントなどに記された
+		nrtのアドレスが間違っていましたので訂正しました.
+		長い間放置してしまって申し訳ございませんでした.
+	<LI> autoconf 化しました (itojunさんの貢献です).
+	<LI> 複数のファイルを同時に開けるようにしました.
+		ファイル間の移動は :n と :p です.
+		リクエストを下さった方,
+		こちらの不手際でメールを紛失してしまい,
+		連絡がとれなくてごめんなさい.
+	</UL>
+<P>
+<LI> ver 4.40 (Oct.27th,1998) <BR>
+	次の点を修正しました.
+	<P>
+	<UL>
+	<LI> 子プロセス (zcat) を起動した後で wait するのを忘れていました.
+		そのため lgrep に沢山の圧縮されたファイルを渡すと
+		一気にプロセステーブルを食い潰すという情けないバグがありました.
+		ファイルを close する際に wait するように修正しました.
+		これを機会に新しい版をリリースします.
+	<LI> iso-2022-cn のANSIエスケープシーケンスによる修飾に一部バグがありました.
+		具体的には文字集合の切れ目を跨ぐ属性が指示シーケンス部で反映されませんでした.
+	<LI> MSDOS で make できない & conf.c 周りにバグがあるというレポートを頂きました.
+		ソースと Makefile を修正して MSDOS で make できるようにしました.
+		村井さん (lvリリース当初からお世話になっています),
+		レポートありがとうございます.
+	<LI> lv.hlp を Makefile の中で指定した libdir に置くように変更しました.
+		研究室の竹島くん&lt;takesima@mt.cs.keio.ac.jp&gt;, ありがとう.
+		エディタを起動する機能も竹島くんのリクエストでしたね.
+	<LI> Unicode など各種マップファイルをきちんと make で作れるように
+		src/Makefile を修正しました.
+		変換テーブルをftpする時に``fetch''を使っています.
+		他のツールを使う時は適宜変更して下さい.
+	</UL>
+	<P>
+	Tips: どこにも書かずにいましたが,
+	kterm で CNS 11643-1992 を表示できるようにすると便利です
+	(gset.h, gset.c を修正すると簡単に追加できます).
+	CNS 11643-1992 Plane 1 や Plane 2
+	のフォントはフリーのものが配布されています.
+	mnewsのリーダにlvを指定すると中文のニュースを読むのが簡単です.
+	特にニュースはbig5とeuc-chinaとhzとutf-8が入り混じっているので,
+	自動判別(失敗した場合はRun-Timeのコード系切り換え)は便利に感じます.
+	出力をISO 2022系に限定することにより,
+	フォントもGB (eucとhzとutf-8)とCNS (big5とutf-8の一部)の2種類で足り,
+	かつ,そのままの環境で日本語も表示できますので,
+	端末など環境を変えるわずらわしさが省けます.
+	<P>
+	日本語のドキュメントはまだ(再)整備していません.
+	次回くらいにアーカイブに含めたいと思います.
+<P>
+<LI> ver 4.39 (Aug.10th,1998) <BR>
+	4.38に, やっぱりバグがありました.
+	即座に教えて頂いた川幡さん,ありがとうございます.
+	またバグがありましたらご連絡ください.
+	<P>
+	Tips: Emacs には grep (Emacs 20 以降には更に grep-find) という機能があり,
+	grep した結果を使用してタブジャンプすることができるそうです.
+	ここで grep の代りに lgrep を使用することができます.
+	ただしコード系の設定をきちんとする必要があるみたいで,
+	<PRE>
+	(define-program-coding-system "*grep*" nil (cons *euc-japan* *euc-japan*))
+	(setq grep-command "lgrep -n ")
+	</PRE>
+	こんな風にしたらうまく動作しました.
+	(find-grepは Mule 2.3 には無いみたいで試していません).
+<P>
+<LI> ver 4.38 (Aug.10th,1998) <BR>
+	川幡さん(kawabata@exa.onlab.ntt.co.jp)のご指摘により次の点を改善しました.
+	lgrepのコマンド引数に,
+	行数を表示するオプション -n を加えた,
+	またgrepの対象となるファイルが一つの場合はファイル名を表示しない,
+	さらにgrepのマッチングを逆転するオプション-vを作成し,
+	従来の-v (バージョン表示)を-Vに変更しました.
+	<P>
+	その他, lv.c を分割して conf.c を作成した,
+	lgrep として動作する時の検索パターンのコード位置の自動変換の修正など,
+	変更点が比較的多目のため,
+	バグを入れてしまった可能性もあります.
+	バグを発見した時はバグレポートをお願い致します.
+<P>
+<LI> ver 4.37 (Jun.22nd,1998) <BR>
+	よしださん(yoshidam@inse.co.jp)のご指摘により次の点を改善しました.
+	utf-7のエンコーディング時の'+'の扱いにバグがありました.
+	<P>
+	久しぶりにコードを見直しました.
+	時間がある限り修正いたしますのでバグレポートをお願い致します.
+<P>
+<LI> ver 4.36 (Jan.27th,1998) <BR>
+	正規表現関連にバグがありました.
+	またUnicodeでないファイルをUnicode端末で表示した時に,
+	サーチ文字列の自動変換が動作しないバグがありました.
+<P>
+<LI> ver 4.35 (Jan.15th,1998) <BR>
+	HZでエンコードできるようにした.
+<P>
+<LI> ver 4.34 (Jan.7th,1998) <BR>
+	grep として使えるようにした.
+	lv に lgrep という名前のリンクを張ると grep のように動作します.
+	HZをサポートした.
+	それに伴ないオプション -z を HZ デコード用に譲り渡し,
+	これまでの -z を -p に変更した
+	(このHZは完全な実装ではありません).
+	指定したオプションをクリアするオプションを -+ に変更した.
+	ドキュメントを修正した.
+	日本語版のドキュメントを廃止した.
+	(relnote は依然日本語ですが ;-)
+<P>
+<LI> ver 4.33 (Dec.11th,1997) <BR>
+	端末制御がバグってました.
+	そのせいで kterm 上で latin1
+	などをカット&ペーストしてサーチすることができませんでした.
+	lv の端末制御を ioctl から termios に移行した時からのバグでした.
+	(これは 4.21 以前から発生していた模様です. おかしいなぁ...
+	気づかなかった私がバカです.)
+	<P>
+	コード変換
+	(Big5->CNS, CNS->Big5, Unicode->etc, etc->Unicode など)
+	を伴う場合の文字列サーチが上手く働かない点を少し改善した.
+	キーボードのコード系を指定しなかった場合,
+	出力のコード系と同じコード系が設定されるように変更した
+	(画面からのカット&ペーストを考慮してそうしました).
+	その他, いろいろとソースを整理したため, ちょっとバギー. (^_^;;
+	<P>
+	GNU Win32 でも make できるようにしましたが,
+	我慢できない程遅くて使いものになりません.
+	Win32 がもうちょっとまともになったら対応しましょう.
+<P>
+<LI> ver 4.32 (Dec.5th,1997) <BR>
+	入力コード系に auto-select を指定し, かつ,
+	8ビットの立っている文字を発見した時の,
+	文字コードの自動判別を強化した.
+	これに伴ないデフォルトのEUCのコード系を指定するオプション -D
+	を新設した.
+	これは自分の環境で普段使っているコード系のことではなく,
+	自分の環境で読む可能性の最も高い『EUC』のコード系を意味している.
+	また, 判別に失敗した時のデフォルトを ISO 8859-1 に変更した.
+	(これまで shift-jis になっていたが,
+	それは不自然だとつくづく思っていた).
+	また,自動判別に失敗した場合に,
+	lv の中から入力コード系を変更できるように
+	C-t, t, Tの3つの実行時コマンドを用意した.
+<P>
+<LI> ver 4.31 (Dec.2nd,1997) <BR>
+	カーソルキーを見るように変更した.
+<P>
+<LI> ver 4.30 (Nov.15th,1997) <BR>
+	FreeDOS という MSDOS互換の OS があることを知り,
+	さっそく lv を動かしてみたのですが結果は全くダメでした.
+	そこで MSDOS 版の画面出力をちょっと触りました.
+	これまで int 29h は使用しないことにしていましたが,
+	FreeDOS のためにポリシーを変えました.
+	今後は RS232C などを使ったリモート端末で
+	lv が正常に動作しませんのでご注意ください.
+	具体的には, RS232C に出力すべき画面がコンソールに出力されるという,
+	elvis のようなおばかさんな状態が発生します.
+	しかし, いまどき DOS に AUX で入る人も稀でしょうから,
+	そんな場合はソースを変更するようにしてください.
+<P>
+<LI> ver 4.29 (Nov.6th,1997) <BR>
+	X0201のカタカナをX0208に変換するオプション -k を作った.
+	オプション-Fを-Pに変更した.
+<P>
+<LI> ver 4.28 (Nov.5th,1997) <BR>
+	最近のどれかのバージョンでパス名(ファイル名)のコード系をオプション-F
+	で指定できるようにしたことをマニュアルに記述するのを忘れていた.
+	しかし, この機能が完全でなかったため, 直した.
+	MSDOS で make できない点を直した.
+<P>
+<LI> ver 4.27 (Oct.31th,1997) <BR>
+	オプション -d をデフォルトにした.
+<P>
+<LI> ver 4.26 (Oct.29th,1997) <BR>
+	オプション -E でエディタを定義し,
+	コマンド v でそのエディタを起動できるようにした.
+	ver 4.23 で直したはずの正規表現のバグが直ってなかった.
+	これを直した.
+<P>
+<LI> ver 4.25 (Oct.27th,1997) <BR>
+	lv を使って kterm などの上でファイルを見ている時に,
+	複数行にまたがる (論理的な) 一行をカット&ペーストしたつもりが,
+	行末で分割された複数の行としてペーストされてしまい,
+	ちょっとムカつくことが度々あります.
+	この問題は,
+	ビューアと実際の表示処理を行なう系が異なることに根本的な原因があり,
+	諸処の原因により,
+	これを完全に期待どおりの動作に修正することには困難が伴ないます
+	(ロバストネスと利便性にトレードオフがある).
+	しかし, ちょっと我慢できないため,
+	これを部分的に改善する方法を用意しました.
+	<P>
+	オプション -l を指定すると,
+	^L や ^R で画面をリフレッシュすることにより,
+	物理的に分割された論理行を一つの行としてカット&ペーストできるようになります.
+	<P>
+	具体的には,
+	論理的に連続する物理行の行末で,
+	カーソルを次の行に送るといった余計なコードを送出しません.
+	この方法は kterm などでは上手く動作しますが,
+	一般の端末で通用するロバストな方法ではありません.
+	端末の行末に漢字がまたがる場合などに自動的に次の行にカーソルが移動する端末でのみ,
+	この動作が正しく動作します.
+	<P>
+	kterm などを使用していて,
+	上記の動作に問題がなければオプション -l を指定して使ってください.
+<P>
+<LI> ver 4.24 (Oct.21st,1997) <BR>
+	.gz や .Z のファイルが無い場合に,
+	最初から弾くようにした.
+<P>
+<LI> ver 4.23 (Oct.14th,1997) <BR>
+	UNIX版で扱える最大行数を 2^31 行に変更した
+	(ただし, 実際にはそこまで資源を確保できないでしょう).
+<P>
+<LI> ver 4.23 (Sep.?,1997) <BR>
+	正規表現の最後にバックスラッシュがあるとハングするバグを退治.
+<P>
+<LI> ver 4.21 (Mar.26th,1997) <BR>
+	大変申し訳ありません!!
+	``big5-hku''は大嘘でした.
+	(やっぱりETenっぽいようです.)
+	もう混乱を招きたくないため,
+	今後はbig5の表記を安直に『big5』で統一いたします.
+	(これで安心して眠れます. :-)
+	<P>
+	この版で私の学生生活中に行なうリリースを終了します.
+	lvは私一人が作ったものではありません.
+	大勢の方々の御協力に感謝いたします.
+	皆様,長い間,お疲れ様でした.
+	<P>
+	どなたかlvのロゴを作りませんか?
+	(CDのジャケット風でも良いです.)
+	ダウンロード用のクリックボタンも欲しいです.
+<P>
+<LI> ver 4.20 (Mar.22th,1997) <BR>
+	ドキュメントとソースに含まれていた,
+	いくつかのtypoを直しました.
+	スクリーンへの表示関係を少々触りました.
+	istrのアロケーションを少々触りました.
+	ただし,それほど大きな違いはありません.
+	<P>
+	3月14日に fj にアナウンスしましたが,
+	特にバグレポートが無いようですから,
+	ここで長期に渡ったβテストに区切りをつけたいと思います.
+	今後,
+	このまましばらく様子を見て,
+	lvの開発を中断します.
+	<P>
+	皆様,何度も何度もダウンロードさせてしまって申し訳ありませんでした.
+	βテストに参加して頂いた大勢の方々,
+	どうもお疲れ様でした.
+	<P>
+	次は FAQ でも作りたいですね.
+<P>
+<LI> ver 4.2beta5 (Mar.14th,1997) <BR>
+	オプションの指定方法を少し変更した.
+	スイッチだけのオプション,
+	例えば -c や -d を -cd と書いても良いようにした.
+	これまでbig5をETenとして扱っていたが,
+	Unicode との絡みで,
+	それは big5-hku でなければならないことに気づいた.
+	そのためbig5-etenの表記をbig5-hkuに修正し,
+	CNS との変換テーブルから ETen 部分を削除した.
+	(各種 big5 に共通な部分だけが有効になります).
+	<P>
+	Unicode から ISO 8859-* への変換で, 取りこぼしが一文字あった.
+	Unicode から iso-2022-cn で使用される文字集合への変換で,
+	これまでは, まず CNS 11643-1992 への変換を試みた後で,
+	次に GB 2312-80 への変換を行なっていたが,
+	これを逆にした.
+	<P>
+	つまり, Unicode を iso-2022-cn で出力する場合,
+	GB 2312-80 が優先される.
+	GB に無い文字は CNS で出力される.
+	(この辺のポリシーは何も定義されていないようですね?)
+	そして現状では, CNS を優先した iso-2022-cn は考えないことにする.
+	(実際に現場ではどのように使用されているのでしょう?!)
+	ただし,
+	CNS だけを含む iso-2022-cn は,
+	Unicode から euc-taiwan や big5 を経由して
+	iso-2022-cn を出力することで作ることができる.
+	その場合, Unicode から CNS へ変換できない文字は
+	``?'' (Question mark) となる.
+	<P>
+	Unicode について.
+	現在 lv が使用しているテーブルは Unicode 1.1 に基づいています.
+	(これは先程気づきました. :-)
+	そして現在の Unicode 標準は 2.0 のようですから,
+	一部,
+	誤ったコード位置への変換が行なわれているみたいです.
+	『直』の誤変換は目立ちますね. (^_^;;
+	　と思ったら,
+	Unicode 2.0 でも直ってないようです(?)
+	これって,正しいマッピングなんでしょうか...
+	(よく似ている文字にマッピングが無いのに,
+	こんなに違う文字にマッピングがあったりして,
+	よく分からない Unicode.)
+	<P>
+	Unicode 2.0 と CJK unified ideographs 間のマッピングのテーブルですが,
+	ftp://unicode.org/ から入手することができます.
+	<P>
+	いくつかメモ.
+	Unicode から CNS 11643-1992 への変換について,
+	現在は(内容のそろった)変換テーブルが入手できないため,
+	lv では Big5-HKU を経由して変換を行なっている.
+	Unicode → Big5-HKU →(各種big5共通部分)→ CNS,
+	あるいは CNS →(各種big5共通部分)→ Big5-HKU → Unicode.
+	なお,
+	Big5 - CNS 間で変換できない文字は全て ``?'' (Question mark) になる.
+	なお, lv は ISO-IR-165 (実体は GB2312-80 + その他, だそうです)
+	をコード変換の対象としては扱っていない.
+	<P>
+	いろいろ書きましたが,
+	前バージョンからの変更点は冒頭で挙げた点だけです.
+	最近バグレポートが来ないので,とても淋しいです(^_^;;
+<P>
+<LI> ver 4.2beta4 (Mar.12th,1997) <BR>
+	- (マイナス) や + で始まるファイルを見ることができなかったため,
+	オプション ``-'' (それ以降の引数をファイル名と見なす) を作った.
+	Makefileを整理した.
+	(コンパイラフラグを ``CONFIG'' というファイルに分離しました.
+	こちらを修正してください.)
+	書庫を整理した.
+	MSDOS版の書庫にソースを入れるのをやめた.
+	UNIX版の書庫で,
+	これまで別のファイルになっていたソースファイルの書庫を,
+	サブディレクトリに展開するようにして一つの書庫にまとめた.
+	各ファイル名の先頭に書庫の名前のディレクトリを含めた.
+	(つまり,展開するとサブディレクトリができます.
+	そのディレクトリで make して下さい.
+	ソースはそのまたサブディレクトリに展開されます.)
+<P>
+<LI> ver 4.2beta3 <BR>
+	ありません.
+	このバージョンは FreeBSD 用の ports を作るために一時使用しました.
+<P>
+<LI> ver 4.2beta2 (Mar.4th,1997) <BR>
+	UTF-7のエンコーディングに一部,バグがありました.
+	(base64の列の途中で画面制御用のエスケープシーケンスが出てしまっていました.
+	help.jaをUTF-7端末で表示するとすぐ分かりますね.)
+	ms-kanjiの表記をshift-jisに改めた.
+	それに伴ってオプションも m から s に変更した.
+	(ただし, これまでの lv でも s と m の両方が使えます.)
+	オプション名を大幅に変更した.
+	(大文字のものを小文字に変更しました.)
+	オプション-Uでbig5-etenをCNSに変換することをやめた.
+	オプション-uは旧JISを新JISへ,
+	またJISローマ字をASCIIへ変換するために使ってください.
+	ページをめくる際にスクロールを使って古い内容を掃き出すオプション-sを新設した.
+	(皆様の好みにまかせます.)
+	注意: 『cat | lv』を実行してはいけません!
+	^C が効かないため,困ったことになります.
+	(実行してしまった場合は cat の方を殺してください.)
+	これを, きちんと ^C で止められるように修正しました.
+	どなたかlvのロゴを作りませんか?
+<P>
+<LI> ver 4.2beta1 (Mar.2nd,1997) <BR>
+	試験的に Unicode をサポートしてみました.
+	まだ, あまり Unicode のことを理解していないのですが,
+	とりあえず Unicode 端末で作業ができる程度まで作ってあります.
+	バージョンを一つ進めます.
+	<P>
+	Unicodeの変換テーブルは
+	<A HREF="ftp://unicode.org/pub/UNIX/MAPPINGS/">
+	ftp://unicode.org/pub/UNIX/MAPPINGS/
+	</A>
+	から入手することができます.
+	フリーということですので lv のソースに含めました.
+	ただし,
+	そのままの形式でファイルを再配布するのはマズいようです.
+	<P>
+<!--
+#       This file is provided as-is by Unicode, Inc. (The Unicode Consortium).
+#       No claims are made as to fitness for any particular purpose.  No
+#       warranties of any kind are expressed or implied.  The recipient
+#       agrees to determine applicability of information provided.  If this
+#       file has been provided on magnetic media by Unicode, Inc., the sole
+#       remedy for any claim will be exchange of defective media within 90
+#       days of receipt.
+#
+#       Recipient is granted the right to make copies in any form for
+#       internal distribution and to freely use the information supplied
+#       in the creation of products supporting Unicode.  Unicode, Inc.
+#       specifically excludes the right to re-distribute this file directly
+#       to third parties or other organizations whether for profit or not.
+-->
+	<P>
+	MSDOS版には Unicode を扱う機能はありません.
+	<P>
+	バグレポート,その他,
+	よろしくお願い致します.
+<P>
+<LI> ver 4.1beta7 (Feb.25th,1997) <BR>
+	オプション-Eを廃止した.
+	big5は,やはりbig5のまま読み込むことにした.
+	ただし,
+	この場合,
+	big5をiso-2022-cnなどで出力すると,
+	文字列のサーチが正常に機能しない(逆も同様.これは仕様になります.).
+	ただし,
+	オプション-Uを指定すれば
+	big5を常にCNSに変換して読み込むことができるため,
+	そのような問題を回避できる.
+	変換できないbig5は8ビット目を落して出力することにした.
+	big5からCNSへの変換ルーチンにバグがあった.
+	論理行に対する物理行の制限を16行から64行に増やした.
+	(1024文字が全て4ケタ表示の制御文字だったとして, 4096ケタ.
+	これを80ケタで表示すると52行ですので,
+	だいたいそれくらいで良いと思います.)
+<P>
+<LI> ver 4.1beta6 (無し) <BR>
+	あれ, なぜか無いですね (^_^;;
+	<P>
+	ちょっと混乱しています.
+<P>
+<LI> ver 4.1beta5 (Feb.23th, 1997) <BR>
+	JIS C 6226がeuc-japanで出力されないという,
+	非常に情けないバグが発見されました.
+	これを直しました.
+	一方,
+	JIS X 0201ローマ字をASCIIに,
+	JIS C 6226 を JIS X 0208 に変換するオプション-Uを新設しました.
+	(このオプションとは関係なく, C6226 は euc-japanで出力されます.)
+	またオプション -U は,
+	ISO 2022のデコードに関して,
+	lvが知らない文字集合のうち94文字集合のものを ASCII として読み込みます.
+	これによりlvの認識する文字集合をいくつか削除しました.
+<P>
+<LI> ver 4.1beta4 (Feb.18th, 1997) <BR>
+	ANSIエスケープシーケンスをカスタマイズできるようにした.
+	英語版のドキュメントを作った.
+<P>
+<LI> ver 4.1beta3 (Feb.14th, 1997) <BR>
+	村井さん(murai@geophys.hokudai.ac.jp)の指摘により,
+	コード系の自動選択が状況によって作動しないバグを修正した.
+	コード系を整理し,
+	ISO 2022系統をiso-2022-cn, iso-2022-jp, iso-2022-krに限定した.
+	(これまで余計に設定していたものを削除した.)
+	自動選択中に仮定するコード系をiso-2022-krに変更した
+	(これまではG1に半角カナが乗っていた. それをハングルに変更した.).
+	iso-2022-cnとeuc-taiwanを新設した.
+	それに伴いCNS 11643-1992をitableに含めた.
+	またbig5とCNSの相互変換を行なえるようにした.
+	big5の表記をbig5-etenに改めた.
+	コード系の名称変更と新設/廃止に伴い,
+	該当するオプションも修正した.
+	このドキュメントを一新した.
+<P>
+<LI> ver 4.1beta2 (Feb.12th, 1997) <BR>
+	松原さん(moody@osk.threewebnet.or.jp)の指摘により,
+	SystemV系の^Zの扱いを改善し,
+	きちんとプロセスグループへSIGSTOPを飛ばすようにした.
+	(これまで気づかなくて済みません.)
+	バイナリファイルをRawモード以外で読み込むとセグメンテーションフォルトを
+	起すことがありました. (まれにIstrFree()でSIGSEGVが飛ぶ)
+	これを直した.
+	manの出力を見る時などに複数の文字属性を指定しても最後の一つしか有効に
+	ならなかった点を改善した.
+	また,manの結果を見る際の^Hの扱いに不備があったので直した.
+	オプション-Mを-Pに変更した.
+<P>
+<LI> ver 4.1beta1 (Feb.8th,1997) <BR>
+	ようやく修論が終りました.
+	さて,
+	lvのバージョンを一つ上げます.
+	よって ver 4.0 の正式版は存在しません.
+	4.1では以前から懸案だった,
+	標準入力とzcatからの入力をパイプで読むことにしました(UNIX版).
+	ただしlvの構造的問題から,標準入力を表示する場合,
+	1画面分(+ページの切れ目まで)を読み込まないと表示できません.
+	どうしても標準入力を読み込んだ『その時』に表示したいという場合は,
+	-Mオプションを指定してください.
+	それから,
+	Linuxのサポートを加えました.
+	(termcap版のみ. Linuxのterminfo版は,まだ確認していません.)
+	その際, UNIXの端末制御関係のファイルをかなり触りました.
+	以前のバージョンでは,
+	-Cオプションを指定すると,
+	リダイレクトやパイプで出力した時に
+	エスケープシーケンスの情報が抜け落ちるというバグがありましたが,
+	直しました. 常時オンにしていてもOKです.
+	コード系の判断の方法も変更しました.
+	これまで先読みを行なって判断していましたが,
+	判断する必要が迫られるまで判断しないことにし,
+	『漢字らしき文字を含む最初の一行』で
+	コード系を決定することにしました.
+<P>
+<LI> ver 4.0beta9 (Jan.6th,1997) <BR>
+	ウィンドウ端末をリサイズした際に,
+	場合によっては誤動作することがあった.
+	リロード中に,リロードしていると表示するようにした.
+<P>
+<LI> ver 4.0beta8 (Dec.28,1996) <BR>
+	サーチを高速化した.
+	(これくらいが限界のようです.
+	lessの最新バージョンと比較してみてください.
+	もう負けないぞ :)
+	ASCII文字の大文字/小文字を区別しないサーチを作った.
+	(オプション-Dで指定してください.)
+	最大行数を32768行に変更した.
+	コード系の判断のためにファイルを読み込むバイト数の上限を
+	16Kバイトに変更した.
+<P>
+<LI> ver 4.0beta7 (Dec.15,1996) <BR>
+	野中さん (nona@in.it.okayama-u.ac.jp) の指摘により,
+	次の3点を改善した:
+	beta6 の zcat 展開で, コード系の選択が正しく行なわれなかった.
+	日本語に対するBSの扱いを, 日本語の man が正しく通る程度に改善した
+	(つもり).
+	ttyからの標準入力の読み込みはしないことにした.
+<P>
+<LI> ver 4.0beta6 (Dec.12,1996) <BR>
+	石塚さん (ishizuka@db.is.kyushu-u.ac.jp) の指摘により,
+	サフィックスがgz, z, Zのファイルはzcatで展開してから読むようにした.
+<P>
+<LI> ver 4.0beta5 (Dec.10,1996) <BR>
+	リロードした時に二重にファイルをクローズしてしまい,
+	bus errorやsegmentation faultを起していた.
+	リロードした時に,サーチ中のフラグが落ちてしまい,
+	最初のサーチが同じ場所にヒットしてしまっていた.
+<P>
+<LI> ver 4.0beta4 (Dec.9,1996) <BR>
+	ヘルプファイルを分離した.
+	リロードした際にサーチパターンをクリアしていたが,
+	クリアしないことにした.
+	DOS版で, file_t も i_str_t と同様に far ポインタ化した.
+	DOS版のメモリ管理についてメモ:
+	mallocで配置されるヒープサイズに制限を設けました.
+	現在は10Kバイト取ってあります.
+	もしDOSのメモリが余っているのにnot enough memoryというエラーが
+	出て異常終了するようなことがあれば,
+	lv.c の中の HEAP_SIZE の設定を,
+	より大きな値に変更してmakeし直してください.
+	UNIX版ではそのような設定はありません.
+	(当然, far というキーワードも無効にしてあります.)
+<P>
+<LI> ver 4.0beta3 (Dec.8,1996) <BR>
+	DOS版のメモリ配置関係のコードを重点的に修正した.
+	ファイルをリロードする機能を加えた.
+<P>
+<LI> ver 4.0beta2 (Dec.5,1996) <BR>
+	大きくなり過ぎた正規表現関係のファイルを分割した.
+	MSDOS版で文字列の配置にfarメモリを使用するようにした.
+	これによって並のバイナリファイルでは
+	セグメント内でのメモリ不足の問題は起こらなくなった.
+	(メモリを食う&遅くなると思いますが,
+	ファイルが『見れない』よりかは良いのではないかとも思います.)
+<P>
+<LI> ver 4.0beta1 (Dec.4,1996) <BR>
+	やはり,バージョンを進めることにした.
+	(よってver 3.9の正式版は存在しないことになります).
+	iso-8859-*を8単位系のISO 2022としてエンコードするように変更した.
+	(これまでEUCとして扱っていた.)
+	ISO 2022を8単位系も含む形に修正した.
+	ms-kanjiのG1集合の初期値が間違っていたので直した.
+	エンコード関係のコードを部分的にまとめた.
+<P>
+<LI> ver 3.9beta19 (Dec.3,1996) <BR>
+	文字のコード長を2バイトまでに制限した.
+	(全ての文字を2バイトで表現することにした).
+	それに伴って,デコード/エンコードの大部分に修正を加えた.
+	正規表現によるサーチを加えた.
+	オプションをファイルから指定できるようにした.
+	指定済みのオプションを無効にするオプションを加えた.
+	入力文字列のヒストリを戻せるようにした.
+	<P>
+	このバージョンはbeta18以前と比較して非常に多くの修正を加えているため,
+	極めてバギーと思われます.
+	特に正規表現の実装は,まだ安直なもので,
+	Muleのドキュメントにあるような『真の正規表現』には,
+	ほど遠い状態にあります.
+	もし正規表現まわりの動作でおかしな所があれば,
+	ぜひぜひ,私にお知らせください.
+<P>
+<LI> ver 3.9beta18 (Dec.3,1996) <BR>
+	無し.
+<P>
+<LI> ver 3.9beta17 (Nov.25,1996) <BR>
+	文字集合を1個加えた.
+	SPの扱いに不備があったので直した.
+	UNIX版のSuspendに不備があったので直した.
+	(これまで自分に送っていたSIGSTOPを,
+	自分のプロセスグループに送るようにした.)
+<P>
+<LI> ver 3.9beta16 (Nov.24,1996) <BR>
+	画面出力にムダが多かったので,なるべくムダな出力をしないようにした.
+<P>
+<LI> ver 3.9beta15 (Nov.17,1996) <BR>
+	いくつかの文字集合を削除した.
+	iso-2022-krを加えた. (といっても実体はiso2022-7bit-ls).
+	encode/decode関連の関数を整理した.
+	文字列サーチの結果表示が少しバグっていた.
+<P>
+<LI> ver 3.9beta14 (Nov.16,1996) <BR>
+	ANSIエスケープシーケンスのうち,
+	文字の色や属性値を指定するシーケンスを通すことが出来るようにした.
+	(オプション-Cで指定する).
+	ヘルプメッセージをプログラム本体に含め直した.
+	rawモードと同様に他のコード系でも,
+	そのコード系で出力できない文字を無理矢理出力する場合に,
+	文字集合のバイト数が表示幅より多い時,
+	表示ずれを起すバグがあったので直した.
+<P>
+<LI> ver 3.9beta13 (Nov.15,1996) <BR>
+	プログラム本体からヘルプファイルを分離した.
+<P>
+<LI> ver 3.9beta12 (Nov.15,1996) <BR>
+	いくつかのオプションを変更した.
+	出力のコード系は-Oで指定することになった.
+	すべて(入力,キーボード,出力)のコード系を-Aで指定できるようにした.
+	文字集合とコード系にbig5を加えた.
+	これまで標準入力がttyデバイスでない場合はヘルプを表示していたが,
+	標準入力を受けつけるようにした.
+	コマンド周りを修正した.
+	キーバインドをテーブルにして,変更を容易にした.
+	いくつかのコマンドを加えた.
+	<P>
+	今回加えたbig5の各文字は,内部的にもbig5そのままで格納されます.
+	これをiso-2022-jpやiso2022の7ビットで出力しようとすると
+	8ビット目が立っているコードが出てしまいますので
+	注意してください (Big5はiso2022には適合していないので,
+	そもそもそんな出力はできない).
+	なお,
+	big5を無理矢理iso2022で出力する際の終端文字には3/0を使用しています.
+<P>
+<LI> ver 3.9beta11 (Nov.14,1996) <BR>
+	base64, quoted-printable のコードを削除した.
+	最大行数を越えたファイルに対しては,ファイル末尾で通常の(END)ではなく,
+	(TRUNCATED)と表示するようにした.
+<P>
+<LI> ver 3.9beta10 (Nov.12,1996) <BR>
+	EUCの解釈に重大な誤りがあったことを自覚しました.
+	てっきりEUCはISO 2022に適合していると思い込んでいたのですが,
+	そうじゃないんですね!
+	申し訳ありませんでした. (ふぅ,あぶなかった...)
+	という訳で,
+	SS2, SS3の後の文字はGRに呼び出されるように(というより,むしろ,
+	8ビット目を立てて出力するように)変更しました.
+	<P>
+	その他:
+	ページサイズとオンメモリページ数についてメモ.
+	ひと画面に表示されている複数のページに関して,
+	例えば画面の上端と下端などで,
+	同一ブロックにアクセスする状況を作ってはいけない.
+	(例えば,
+	DOS版でページサイズ16行,オンメモリ2ページ,という設定はできない.)
+	この制限を守れば,
+	ページサイズ,オンメモリページ数,共に2のべき乗の数で変更して良い.
+	ただし, lv で扱える最大行数はPAGE_SIZE * SLOT_SIZE で決まるため,
+	ページサイズを縮めると,その分,扱える行数が減るので注意.
+<P>
+<LI> ver 3.9beta9 (Nov.9,1996) <BR>
+	文字集合をいくつか追加した.
+	コード系の定数名を変更した.
+	ISO 2022の7単位系のエンコードに関してシングルシフトを用いるものと,
+	ロッキングシフトを用いるものと,両方を用意して選択できるようにした.
+	ISO 2022のエンコーディングにバグがあった.
+	(擬似文字集合の切り換えの際に不要な指示を行なっていた.)
+	rawモードにおいて,文字集合のバイト数が表示幅より多い場合,
+	表示ずれを起すバグがあった.
+<P>
+<LI> ver 3.9beta8 (Nov.8,1996) <BR>
+	ASCII端末用にraw encoding/decodingを加えた.
+	これまでMSDOS版で用意していたFMR-CARD版, PC9801版を廃止した.
+	screen.cから表示関係の関数を分離してdisplay.cを作った.
+<P>
+<LI> ver 3.9beta7 (Nov.7,1996) <BR>
+	FreeBSD用のコードを加えた.
+	ファイルの最後を示すフラグを誤ってファイルの途中で立てていた.
+	beta5の(ちょっと)高速化がやっぱりバグっていた.直したつもり.
+	オプションを環境変数からも指定できるようにした.
+	画面サイズをオプションから設定できるようにした.
+	端末制御に行の削除/挿入の機能がないことを示すオプションを-Zに変更した.
+	このバージョンは1度配布可能状態に置いてから,
+	再び修正を加えて同じバージョンとして新しいものを置いております.
+	(こちらのログによると,暫定beta7をgetなされた方はいらっしゃらない
+	ことになっていますので,問題ないかと思います.)
+<P>
+<LI> ver 3.9beta6 (Nov.7,1996) <BR>
+	UNIX版をコンソールで動かすことを忘れていた.これを直した.
+	SunOS (X, Console),
+	NEWS5000 (SunのXからremote loginした状態),
+	古いRISC News (X, Console),
+	古いCISC News (X, Console),
+	Solaris (X, Console),
+	HP-UX (X, Console),
+	IRIX (X),で各々,動作確認した.
+	次のコマンドを追加した.
+	gで行頭へジャンプ,数字+gで行番号へジャンプ,
+	Qで終了するようにした.
+<P>
+<LI> ver 3.9beta5 (Nov.6,1996) <BR>
+	あまりにlvが遅いため,ちょっと高速化した.
+	(こういう-おぷちまいず-をやると,たいていバグが混入します).
+<P>
+<LI> ver 3.9beta4 (Nov.5,1996) <BR>
+	いくつかのソースのファイル名を変更した.
+	(正確には,分かれていたコンソール関係のソースを1つにまとめた).
+	コンソール関係の関数名をプリフィックスConsoleに変更した.
+	(以前はDisplayだった).
+	MSDOS版でもキーボードインターラプト処理をするようにした.
+	読み込んだ行数の数え方がバグっていたので修正した.
+<P>
+<LI> ver 3.9beta3 (Nov.4,1996) <BR>
+	論理行の最大バイト数を1023byteにした.
+	また,そこから次のLFまでの,
+	これまで無視されていた残りの文字を『次の行』として読めるようになった.
+	ファイルの読み込み中などに,
+	キーボードインタラプトを受けつけるように変更した.
+<P>
+<LI> ver 3.9beta2 (Nov.4,1996) <BR>
+	3.9beta1はEUCのデコードがバグっていた. (気づかなくて御免なさい.)
+	サスペンドする際に画面をフラッシュしていなかった.
+	C-g を『lvの終了』から『ファイル情報(行数など)の表示』に変更した.
+	iso-2022-7bitで96文字集合を出力する場合,
+	これまではG1集合とロッキングシフトを組合せて用いていたが,
+	G2集合とシングルシフトを使うように変更した.
+	コード系の自動選択で,
+	判断のために読み込むファイルのサイズに上限を設けた.
+	現在はファイル先頭の32768バイト(てきとーっす).
+	行番号指定の不都合を直した.
+<P>
+<LI> ver 3.9beta1 (Nov.2,1996) <BR>
+	画面サイズの変更に対応した.
+	base64, quoted-printable のコードを加えた.
+	フィックスしたバグは次の通り.
+	テンポラリファイルが消されなかった.
+	不正なESCシーケンスをスタンドアウトしていなかった.
+	エンコード中に運が悪いとsegmentation faultを起す可能性があった.
+	全ての文字を制御文字と同様に表示できるようにした.
+	ver 3.8 は飛ばす.
+<P>
+<LI> ver 3.8beta1 (Oct.25,1996) <BR>
+	UNIX 用のコードを加えてベータ公開.
+<P>
+<LI> ver 3.7 <BR>
+	lv を機能アップして単独で公開. ここからリリースノートを付する.
+<P>
+<LI> ver 3.7 以前 <BR>
+	nrt のオマケとして配布.
+</UL>
+
+<HR WIDTH="50%">
+
+<CENTER>
+Back to <A HREF="index.html">LV Homepage</A>.
+</CENTER>
+
+<HR>
+
+<ADDRESS>
+<A HREF="/~nrt/">
+<IMG SRC="/~nrt/icons/homepage.gif" ALIGN=right ALT="Back to ">
+NARITA Tomio
+</A> <BR>
+email: nrt@ff.iij4u.or.jp <BR>
+Homepage: http://www.ff.iij4u.or.jp/~nrt/ <BR CLEAR=all>
+</ADDRESS>
+
+</BODY>
+</HTML>

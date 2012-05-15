@@ -1,7 +1,23 @@
 /*
  * utf.c
  *
- * All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+ * All rights reserved. Copyright (C) 1996 by NARITA Tomio.
+ * $Id: utf.c,v 1.7 2004/01/05 07:23:29 nrt Exp $
+ */
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 #include <stdio.h>
@@ -45,20 +61,24 @@ private int base64[ 256 ] = {
   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1  /* f */
 };
 
-private void DecodeAddUnicode( char attr, ic_t uni )
+private void DecodeAddUnicode( byte attr, ic_t uni )
 {
-  if( uni <= (ic_t)SP ){
-    if( (ic_t)SP == uni )
-      DecodeAddSpace( attr );
-    else
-      DecodeAddControl( (char)uni );
-  } else if( uni < DEL )
-    DecodeAddIchar( ASCII, uni, attr );
-  else
+  if( uni <= (ic_t)DEL ){
+    if( uni <= (ic_t)SP ){
+      if( (ic_t)SP == uni )
+	DecodeAddSpace( attr );
+      else
+	DecodeAddControl( (byte)uni );
+    } else if( uni < (ic_t)DEL )
+      DecodeAddIchar( ASCII, uni, attr );
+    else {
+      DecodeAddControl( (byte)uni );
+    }
+  } else
     DecodeAddIchar( UNICODE, uni, attr );
 }
 
-private char DecodeBase64( char attr, char ch )
+private char DecodeBase64( byte attr, byte ch )
 {
   unsigned long acc;
   int val;
@@ -110,9 +130,9 @@ private char DecodeBase64( char attr, char ch )
   return ch;
 }
 
-public void DecodeUTF( state_t *state, char codingSystem )
+public void DecodeUTF( state_t *state, byte codingSystem )
 {
-  char ch;
+  byte ch;
   ic_t uni;
 
   for( ; ; ){
@@ -121,8 +141,6 @@ utfContinue:
     if( ch <= SP ){
       if( SP == ch )
 	DecodeAddSpace( state->attr );
-      else if( CR == ch )
-	continue;
       else if( ESC == ch ){
 	if( FALSE == DecodeEscape( state ) )
 	  break;
@@ -133,7 +151,7 @@ utfContinue:
       else
 	DecodeAddControl( ch );
     } else {
-      if( ch < 0x80 ){
+      if( ch < (ic_t)DEL ){
 	if( UTF_8 == codingSystem ){
 	  DecodeAddIchar( ASCII, (ic_t)ch, state->attr );
 	} else {
@@ -141,17 +159,20 @@ utfContinue:
 	  if( '+' != ch ){
 	    DecodeAddIchar( ASCII, (ic_t)ch, state->attr );
 	  } else {
+	    /* '+' == ch */
 	    GetChar( ch );
 	    if( '-' == ch ){
 	      DecodeAddIchar( ASCII, (ic_t)'+', state->attr );
 	    } else {
 	      ch = DecodeBase64( state->attr, ch );
-	      if( SHIGH == SIDX || LF == ch )
+	      if( SHIGH == SIDX || LF == ch || CR == ch )
 		return;
 	      else if( '-' == ch )
 		continue;
-	      else
+	      else {
+		decoding_penalty++;
 		goto utfContinue;
+	      }
 	    }
 	  }
 	}
@@ -179,6 +200,7 @@ utfContinue:
 	  }
 	}
       } else {
+	decoding_penalty++;
 	DecodeAddControl( ch );
       }
     }
@@ -195,14 +217,14 @@ private void EncodeUTF7PendingBit( utf7_state_t stat, int attr, ic_t uni )
 }
 
 public void EncodeUTF7( i_str_t *istr, int head, int tail,
-		       char codingSystem, boolean_t binary )
+		       byte codingSystem, boolean_t binary )
 {
   int idx, attr, lastAttr;
   ic_t ic, uni = 0;
-  char cset;
+  byte cset;
   utf7_state_t stat;
 
-  attr = lastAttr = NULL;
+  attr = lastAttr = 0;
   stat = ASCII_STATE;
 
   for( idx = head ; idx < tail ; idx++ ){
@@ -222,7 +244,12 @@ public void EncodeUTF7( i_str_t *istr, int head, int tail,
 	  EncodeUTF7PendingBit( stat, lastAttr, uni );
 	  stat = ASCII_STATE;
 	}
-	EncodeAddChar( attr, ic );
+	if( (ic_t)'+' == ic ){
+	  EncodeAddCharAbsolutely( attr, ic );
+	  EncodeAddCharAbsolutely( attr, (ic_t)'-' );
+	} else {
+	  EncodeAddChar( attr, ic );
+	}
       } else {
 	if( UNICODE != cset )
 	  ic = RevUNI( ic, &cset );
@@ -280,11 +307,11 @@ public void EncodeUTF7( i_str_t *istr, int head, int tail,
 }
 
 public void EncodeUTF8( i_str_t *istr, int head, int tail,
-		       char codingSystem, boolean_t binary )
+		       byte codingSystem, boolean_t binary )
 {
   int idx, attr;
   ic_t ic;
-  char cset;
+  byte cset;
 
   for( idx = head ; idx < tail ; idx++ ){
     cset = istr[ idx ].charset;

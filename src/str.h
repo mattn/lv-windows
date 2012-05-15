@@ -1,7 +1,8 @@
 /*
  * str.h
  *
- * All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+ * All rights reserved. Copyright (C) 1996 by NARITA Tomio
+ * $Id: str.h,v 1.5 2003/11/13 03:08:19 nrt Exp $
  */
 
 #ifndef __STR_H__

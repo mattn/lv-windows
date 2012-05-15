@@ -1,7 +1,8 @@
 /*
  * keybind.h
  *
- * All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+ * All rights reserved. Copyright (C) 1996 by NARITA Tomio
+ * $Id: keybind.h,v 1.6 2003/11/13 03:08:19 nrt Exp $
  */
 
 #ifndef __KEYBIND_H__
@@ -30,14 +31,14 @@ private key_table_t keyTable[ 128 ] = {
   CommandNull,		/* C-q */
   CommandRefresh,	/* C-r */
   CommandNull,		/* C-s */
-  CommandNull,		/* C-t */
+  CommandToggleHz,	/* C-t */
   CommandPrevHalf,	/* C-u */
   CommandNextPage,	/* C-v */
   CommandNull,		/* C-w */
   CommandNull,		/* C-x */
   CommandPrevLine,	/* C-y */
   CommandShellEscape,	/* C-z */
-  CommandNull,		/* C-[ */
+  CommandCursor,	/* C-[ */
   CommandNull,		/* C-\ */
   CommandNull,		/* C-] */
   CommandNull,		/* C-^ */
@@ -68,10 +69,10 @@ private key_table_t keyTable[ 128 ] = {
   CommandNull,		/* '7' */
   CommandNull,		/* '8' */
   CommandNull,		/* '9' */
-  CommandNull,		/* ':' */
+  CommandColon,		/* ':' */
   CommandNull,		/* ';' */
   CommandTopOfFile,	/* '<' */
-  CommandNull,		/* '=' */
+  CommandFileStatus,	/* '=' */
   CommandBottomOfFile,	/* '>' */
   CommandFindBackward,	/* '?' */
   CommandNull,		/* '@' */	/* 4/0 */
@@ -80,21 +81,21 @@ private key_table_t keyTable[ 128 ] = {
   CommandNull,		/* 'C' */
   CommandNull,		/* 'D' */
   CommandNull,		/* 'E' */
-  CommandNull,		/* 'F' */
+  CommandPoll,		/* 'F' */
   CommandBottomOfFile,	/* 'G' */
-  CommandNull,		/* 'H' */
+  CommandPrevLine,	/* 'H' */
   CommandNull,		/* 'I' */
   CommandNull,		/* 'J' */
-  CommandNull,		/* 'K' */
+  CommandPrevPage,	/* 'K' */
   CommandNull,		/* 'L' */
-  CommandNull,		/* 'M' */
+  CommandNextPage,	/* 'M' */
   CommandRepeatBackward,/* 'N' */
   CommandNull,		/* 'O' */
-  CommandNull,		/* 'P' */	/* 5/0 */
+  CommandNextLine,	/* 'P' */	/* 5/0 */
   CommandQuit,		/* 'Q' */
   CommandReload,	/* 'R' */
   CommandNull,		/* 'S' */
-  CommandNull,		/* 'T' */
+  CommandReverseCset,	/* 'T' */
   CommandNull,		/* 'U' */
   CommandVersion,	/* 'V' */
   CommandNull,		/* 'W' */
@@ -125,16 +126,16 @@ private key_table_t keyTable[ 128 ] = {
   CommandPercent,	/* 'p' */	/* 7/0 */
   CommandQuit,		/* 'q' */
   CommandRefresh,	/* 'r' */
-#ifdef REGEXPTEST
+#ifdef REGEXP_TEST
   CommandRegexpNFA,	/* 's' */
   CommandRegexpDFA,	/* 't' */
 #else
   CommandNull,		/* 's' */
-  CommandNull,		/* 't' */
-#endif /* REGEXPTEST */
+  CommandToggleCset,	/* 't' */
+#endif /* REGEXP_TEST */
   CommandPrevHalf,	/* 'u' */
-  CommandNull,		/* 'v' */
-  CommandNull,		/* 'w' */
+  CommandEdit,		/* 'v' */
+  CommandPrevLine,	/* 'w' */
   CommandNull,		/* 'x' */
   CommandPrevLine,	/* 'y' */
   CommandNull,		/* 'z' */

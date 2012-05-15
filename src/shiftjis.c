@@ -1,25 +1,37 @@
 /*
  * shiftjis.c
  *
- * All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+ * All rights reserved. Copyright (C) 1996 by NARITA Tomio.
+ * $Id: shiftjis.c,v 1.7 2004/01/05 07:23:29 nrt Exp $
  */
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
+#include <stdio.h>
 
 #include <import.h>
 #include <decode.h>
 #include <escape.h>
 #include <encode.h>
-#include <big5.h>
 #include <unimap.h>
+#include <big5.h>
 #include <begin.h>
 #include <shiftjis.h>
 
-#define IsShiftJisByte1( c )						\
-  ( ( (c) >= 0x81 && (c) <= 0x9f ) || ( (c) >= 0xe0 && (c) <= 0xfc ) )
-
-#define IsShiftJisByte2( c )						\
-  ( ( (c) >= 0x40 && (c) <= 0x7e ) || ( (c) >= 0x80 && (c) <= 0xfc ) )
-
-private void msk2jis( char *c )
+private void msk2jis( byte *c )
 {
   int c1, c2;
 
@@ -41,21 +53,19 @@ private void msk2jis( char *c )
       c2 -= 0x001f;
   }
 
-  c[ 0 ] = (char)c1;
-  c[ 1 ] = (char)c2;
+  c[ 0 ] = (byte)c1;
+  c[ 1 ] = (byte)c2;
 }
 
-public void DecodeShiftJis( state_t *state, char codingSystem )
+public void DecodeShiftJis( state_t *state, byte codingSystem )
 {
-  char charset, ch;
-  char c[ ICHAR_WIDTH ];
+  byte charset, ch;
+  byte c[ ICHAR_WIDTH ];
 
   for( ; ; ){
     GetChar( ch );
     if( ch < SP ){
-      if( CR == ch )
-	continue;
-      else if( ESC == ch ){
+      if( ESC == ch ){
 	if( FALSE == DecodeEscape( state ) )
 	  break;
       } else if( HT == ch )
@@ -69,7 +79,7 @@ public void DecodeShiftJis( state_t *state, char codingSystem )
       else
 	DecodeAddControl( ch );
     } else {
-      if( NULL != state->sset ){
+      if( 0 != state->sset ){
 	if( FALSE == DecodeAddShifted( state, ch ) )
 	  break;
 	else
@@ -122,7 +132,7 @@ public void DecodeShiftJis( state_t *state, char codingSystem )
   }
 }
 
-private void jis2msk( char *c )
+private void jis2msk( byte *c )
 {
   int c1, c2;
 
@@ -143,25 +153,23 @@ private void jis2msk( char *c )
   else
     c1 = ( ( c1 - 0x0021 ) >> 1 ) + 0x0081;	/* 01-62 ku */
 
-  c[ 0 ] = (char)c1;
-  c[ 1 ] = (char)c2;
+  c[ 0 ] = (byte)c1;
+  c[ 1 ] = (byte)c2;
 }
 
 public void EncodeShiftJis( i_str_t *istr, int head, int tail,
-			   char codingSystem, boolean_t binary )
+			   byte codingSystem, boolean_t binary )
 {
   int idx, attr;
   ic_t ic;
-  char cset, sj[ 2 ];
+  byte cset, sj[ 2 ];
 
   for( idx = head ; idx < tail ; idx++ ){
     cset = istr[ idx ].charset;
     ic = istr[ idx ].c;
     attr = (int)istr[ idx ].attr << 8;
-    if( BIG5 == cset )
-      ic = BIG5toCNS( ic, &cset );
 #ifndef MSDOS /* IF NOT DEFINED */
-    else if( UNICODE == cset )
+    if( UNICODE == cset )
       ic = UNItoJIS( ic, &cset );
 #endif /* MSDOS */
     if( cset < PSEUDO ){

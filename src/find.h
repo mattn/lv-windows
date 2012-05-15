@@ -1,7 +1,8 @@
 /*
  * find.h
  *
- * All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+ * All rights reserved. Copyright (C) 1996 by NARITA Tomio
+ * $Id: find.h,v 1.4 2003/11/13 03:08:19 nrt Exp $
  */
 
 #ifndef __FIND_H__
@@ -11,11 +12,14 @@
 #include <itable.h>
 #include <file.h>
 
-typedef ic_t (*tolower_func_t)( char, ic_t );
+typedef ic_t (*tolower_func_t)( byte, ic_t );
 public tolower_func_t to_lower_func;
 
 typedef boolean_t (*find_func_t)( line_t * );
 public find_func_t find_func;
+
+typedef boolean_t (*find_continue_func_t)( i_str_t * );
+public find_continue_func_t find_only_func;
 
 public boolean_t casefold_search;
 public boolean_t regexp_search;
@@ -27,7 +31,8 @@ public boolean_t regexp_search;
 
 public void FindSetup();
 
-public char *FindSetPattern( file_t *f, i_str_t *istr );
+public byte *FindResetPattern( file_t *f, i_str_t *istr );
+public byte *FindSetPattern( file_t *f, i_str_t *istr );
 public boolean_t FindClearPattern( file_t *f );
 
 public int FindForward( file_t *f );

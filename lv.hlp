@@ -1,152 +1,378 @@
-# lv: a Powerful Multilingual File Viewer
-# All rights reserved. Copyright (C) 1994,1997 by NARITA Tomio
+LV(1)                                                       LV(1)
 
-OOppttiioonnss aabboouutt CCooddiinngg ssyysstteemmss:
-  -A<coding-system>: Set all coding systems to coding-system.
-  -I<coding-system>: Set input coding system to coding-system.
-  -K<coding-system>: Set keyboard coding system to coding-system.
-  -O<coding-system>: Set output coding system to coding-system.
 
-    coding-system:
-      a: auto-select (input only)
-      c: iso-2022-cn
-      j: iso-2022-jp
-      k: iso-2022-kr
-      e: Extended Unix Code
-	ec: euc-china
-	ej: euc-japan
-	ek: euc-korea
-        et: euc-taiwan
-      u: UCS transformation format
-	u7: UTF-7
-	u8: UTF-8
-      l: iso-8859-*
-	l1..9: iso-8859-1..9
-      s: shift-jis
-      b: big5
-      r: raw mode
 
-  Examples:
-    -Il2: input coding system is iso-8859-2
-    -Ks:  keyboard coding system is shift-jis
-    -Oek: output coding system is euc-korea
-    -Ab:  all coding systems are big5
+NNAAMMEE
+       lv - a Powerful Multilingual File Viewer / Grep
 
-  Conversions:
-    iso-2022-cn, -jp, -kr can be converted into euc-china or -taiwan,
-    euc-japan, euc-korea, respectively, and vice versa. shift-jis uses
-    the same internal code-points as iso-2022-jp and euc-japan. Similarly,
-    big5 can be handled like iso-2022-cn and euc-taiwan inside lv.
-    You can convert charsets among these coding systems from input to output. 
+SSYYNNOOPPSSIISS
+       llvv,, llggrreepp
+       llvv -h
+       llvv -V
+       llvv [-[+]acdfgiklmnqsuvz]
+            [-A_c_o_d_i_n_g_-_s_y_s_t_e_m] [-I_c_o_d_i_n_g_-_s_y_s_t_e_m] [-K_c_o_d_i_n_g_-_s_y_s_t_e_m]
+            [-O_c_o_d_i_n_g_-_s_y_s_t_e_m] [-P_c_o_d_i_n_g_-_s_y_s_t_e_m] [-D_c_o_d_i_n_g_-_s_y_s_t_e_m]
+            [-Ss_s_e_q] [-Sr_s_e_q] [-Sb_s_e_q] [-Su_s_e_q] [-Sh_s_e_q]
+            [-T_n_u_m_b_e_r] [-W_w_i_d_t_h] [-H_h_e_i_g_h_t] [-E'_e_d_i_t_o_r_'] [-+]
+            [-] (_g_r_e_p _p_a_t_t_e_r_n) [_f_i_l_e_s _._._.]
 
-OOtthheerr ooppttiioonnss:
-  -W<number>	Screen width
-  -H<number>	Screen height
-  -z		Assert there is no delete/insert-lines control.
-		Please set this option on MSDOS ANSI terminals which do not
-		have control to delete and/or insert lines. Meanwhile, as to
-		termcap and terminfo version, it will be set automatically.
+DDEESSCCRRIIPPTTIIOONN
+       _M_u_l_t_i_l_i_n_g_u_a_l _f_i_l_e _v_i_e_w_e_r
+              _l_v  is a powerful multilingual file viewer.  Appar-
+              ently, lv looks like  _l_e_s_s  (1),  a  representative
+              file  viewer  on  UNIX  as you know, so UNIX people
+              (and _l_e_s_s people on other OSs) don't have to  learn
+              a  burdensome  new  interface.   lv  can be used on
+              MSDOS ANSI terminals and almost all UNIX platforms.
+              lv  is  a currently growing software, so your feed-
+              back is welcome and helpful for us  to  refine  the
+              future lv.
 
-  -Ss<seq>	Set ANSI Standout sequence to <seq>  (default "7")
-  -Sr<seq>	Set ANSI Reverse sequence to <seq>   (default "7")
-  -Sb<seq>	Set ANSI Blink sequence to <seq>     (default "5")
-  -Su<seq>	Set ANSI Underline sequence to <seq> (default "4")
-  -Sh<seq>	Set ANSI Highlight sequence to <seq> (default "1")
+       _M_u_l_t_i_p_l_e _c_o_d_i_n_g _s_y_s_t_e_m_s
+              lv  can  decode  and  encode  multilingual  streams
+              through many coding systems, for example, ISO  2022
+              based  coding  systems such as iso-2022-jp, and EUC
+              (Extended Unix Code) like euc-japan.   Furthermore,
+              localized  coding  systems  such as shift-jis, big5
+              and HZ are also supported.  lv can be used not only
+              as a file viewer but also as a coding-system trans-
+              lation filter like _n_k_f (1) and _t_c_s (1).
 
-  -T<number>	Set Threshold-code which divides Unicode code-points in
-		two regions. Characters belonging to the lower region are
-		assumed to have a width of one, and the higher characters
-		are equated to a width of two. (Default: 12288)
-  -m		Force Unicode code-points which have the same glyphs as
-		iso-8859-* to be Mapped iso-8859-* in a conversion from
-		Unicode to another character set which also has the
-		corresponding code-points, in particular, Asian charsets.
+       _M_u_l_t_i_l_i_n_g_u_a_l _r_e_g_u_l_a_r _e_x_p_r_e_s_s_i_o_n_s _/ _M_u_l_t_i_l_i_n_g_u_a_l _g_r_e_p
+              lv can recognize multi-bytes  patterns  as  regular
+              expressions, and lv also provides multilingual _g_r_e_p
+              (1) functionality by giving it another name, _l_g_r_e_p.
+              Pattern matching is conducted in the charset level,
+              so an EUC fragment, for example, can  be  found  in
+              the ISO 2022 tailored streams, of course.
 
-  -c		Allow ANSI escape sequences for text decoration (Color)
-  -d		Make regexp-searches ignore case (case folD search)
-  -f		Substitute Fixed strings for regular expressions
-  -p		Force non-regular files to be Printed immediately
-  -s		Force old pages to be swept out from the screen Smoothly
-  -u		Unify several character sets, eg. JIS X0208 and C6226.
-		In addition, lv equates ISO 646 variants and unknown
-		charsets with ASCII.
+       _S_u_p_p_o_r_t_i_n_g _t_h_e _U_n_i_c_o_d_e _s_t_a_n_d_a_r_d
+              lv provides Unicode facilities which enables you to
+              handle Unicode streams encoded in UTF-7  or  UTF-8,
+              and  lv  can also convert their code-points between
+              Unicode and other charsets.   So  you  can  display
+              Unicode  or  foreign  texts on your terminal, using
+              the  code  conversion  function  to  your  favorite
+              charsets  via  Unicode.  (However, MSDOS version of
+              lv has none of the Unicode facility.)
 
-  -@		Clear all options
-		You can also turn OFF specified options,
-		using ``+<option>'' like +c, +d, ... +z.
+       _A_N_S_I _e_s_c_a_p_e _s_e_q_u_e_n_c_e _t_h_r_o_u_g_h
+              lv can recognize ANSI  escape  sequences  for  text
+              decoration.  So you can look ANSI-decorated streams
+              such as colored source codes generated  by  another
+              software  just  like  intended image on ANSI termi-
+              nals.
 
-  -		Treat the following arguments as filenames
+       _C_o_m_p_l_e_t_e_l_y _o_r_i_g_i_n_a_l
+              lv is a completely original software  including  no
+              code drawn from _l_e_s_s and _g_r_e_p and other programs at
+              all.
 
-  -v		Show lv version
-  -h		Show this help
+OOPPTTIIOONNSS
+       -A<_c_o_d_i_n_g_-_s_y_s_t_e_m>
+              Set all coding systems to _c_o_d_i_n_g_-_s_y_s_t_e_m.
 
-CCoonnffiigguurraattiioonn:
-    Options can be described in configuration file ``.lv'' (``_lv'' on MSDOS)
-    located at you HOME directory and/or current working directory.
-    They can be also described in the environment variable LV. All
-    configuration is overloaded in this order if there is. Command line
-    options are always read finally.
+       -I<_c_o_d_i_n_g_-_s_y_s_t_e_m>
+              Set input coding system to _c_o_d_i_n_g_-_s_y_s_t_e_m.
 
-    Environment examples:
-	UNIX:  setenv LV '-Kej -Oej'
-	MSDOS: set LV=-Im -H25
+       -K<_c_o_d_i_n_g_-_s_y_s_t_e_m>
+              Set keyboard coding system to _c_o_d_i_n_g_-_s_y_s_t_e_m.  If it
+              is not set, output coding system will be applied to
+              it.
 
-CCoommmmaanndd kkeeyy bbiinnddiinnggss:
-  0-9:		Argument
-  g, <:		Jump to the line number (default: top of the file)
-  G, >:		Jump to the line number (default: bottom of the file)
-  p:		Jump to the percentage position in line numbers (0-100)
+       -O<_c_o_d_i_n_g_-_s_y_s_t_e_m>
+              Set output coding system to _c_o_d_i_n_g_-_s_y_s_t_e_m.
 
-  b, C-b:			Previous page
-  u, C-u:			Previous half page
-  k, C-k, y, C-y, C-p:		Previous line
+       -P<_c_o_d_i_n_g_-_s_y_s_t_e_m>
+              Set pathname coding system to _c_o_d_i_n_g_-_s_y_s_t_e_m.
 
-  j, C-j, e, C-e, C-n, CR:	Next line
-  d, C-d:			Next half page
-  f, C-f, C-v, SP:		Next page
+       -D<_c_o_d_i_n_g_-_s_y_s_t_e_m>
+              Set default (fall-back) coding  system  to  _c_o_d_i_n_g_-
+              _s_y_s_t_e_m.
 
-  /<string>:	Find a string in the forward direction (regular expression)
-  ?<string>:	Find a string in the backward direction (regular expression)
+       coding-system:
+              a: auto-select
+              c: iso-2022-cn
+              j: iso-2022-jp
+              k: iso-2022-kr
+              ec: euc-china
+              ej: euc-japan
+              ek: euc-korea
+              et: euc-taiwan
+              u7: UTF-7
+              u8: UTF-8
+              l1..9: iso-8859-1..9
+              l0: iso-8859-10
+              lb,ld,le,lf,lg: iso-8859-11,13,14,15,16
+              s: shift-jis
+              b: big5
+              h: HZ
+              r: raw mode
 
-  n:		Repeat previous search in forward direction
-  N:		Repeat previous search in backward direction (not REVERSE)
+       Examples:
+              -Il2: input coding system is iso-8859-2
+              -Ks:  keyboard coding system is shift-jis
+              -Oek: output coding system is euc-korea
+              -Ab:  all coding systems are big5
 
-  C-l:		Redisplay all lines
-  r, C-r:	Refresh screen and memory
-  R:		Reload the current file
+       Coding-system translations / Code-points conversions:
+              iso-2022-cn,  -jp,  -kr  can be converted into euc-
+              china or  -taiwan,  euc-japan,  euc-korea,  respec-
+              tively  (and  vice versa).  shift-jis uses the same
+              internal code-points as iso-2022-jp and  euc-japan.
 
-  C-g:		Show file information (filename, position, coding system)
-  V:		Show LV version
+              Since  big5  characters  can  be converted into CNS
+              11643-1992  with  negligible  incompleteness,  big5
+              streams  can be translated into iso-2022-cn or euc-
+              taiwan (and vice versa)  with  code-points  conver-
+              sion.   Note  that the iso-2022-cn referred here is
+              not GB sequence, only just  CNS  one.   You  should
+              remember  that  lv  cannot  translate  big5 into GB
+              directly.
 
-  C-z:		Suspend (call SHELL or ``command.com'' on MSDOS)
-  q, Q:		Quit
+              The search function of lv may  not  work  correctly
+              when  lv additionally performs ``code-points'' con-
+              version   (not   ``coding-system''    translation),
+              because  visible code and internal code are differ-
+              ent from each other.  lv will  try  to  avoid  this
+              problem with converting charsets of search patterns
+              automatically, but this function is not always per-
+              fect.
 
-SSttrriinngg iinnppuutt kkeeyy bbiinnddiinnggss:
-  C-m, CR:	Enter the current string
-  C-h, BS:	Delete one character (backspace)
-  C-u:		Cancel the current string and try again
-  C-p:		Restore a few old strings incrementally (history)
-  C-g:		Quit
+       -W<_n_u_m_b_e_r>
+              Screen width
 
-RReegguullaarr eexxpprreessssiioonnss:
-  Special characters are ^, $, ., *, +, ?, [, ^, -,  ], \.
-  \| specifies an alternative. \(, \) is a grouping construct.
-  \1 and \2 matches any charset consists of one- or two- column(s)
-  characters respectively. Mutually overlapping ranges (or charset)
-  are not guaranteed.
+       -H<_n_u_m_b_e_r>
+              Screen height
 
-NNootteess:
-    MMSSDDOOSS VVEERRSSIIOONN OOFF LLVV HHAASS NNOONNEE OOFF TTHHEE UUNNIICCOODDEE FFAACCIILLIITTYY AATT AALLLL.
+       -E'<_e_d_i_t_o_r>' (default 'vi -c %d')
+              Editor name (default 'vi -c %d')
+              ``%d'' means the line number of current position in
+              a file.
 
-    The search function of lv does not work correctly when lv additionally
-    performs ``code'' conversion (not ``coding system conversion''),
-    because visible codes and internal codes are different from each other.
-    This problem happens when you output CNS characters through big5,
-    or in other conversions, especially, via Unicode. In such case,
-    however, you can avoid such problem by reading a pre-converted stream.
-    For example, when you wish to read a big5 stream on a UTF-8 terminal,
-    you can use a pipe like this: ``lv -Ib foo.big5 -Ou | lv -Au''
+       -q     Assert there is delete/insert-lines control.
+              Please set this option on  a  MSDOS  ANSI  terminal
+              that  has capability to delete and/or insert lines.
+              As to termcap and terminfo version, it will be  set
+              automatically.
 
-    You can redirect this help message to a file. 'Q' or 'q' terminates lv.
+       -Ss<_s_e_q>
+              Set ANSI Standout sequence to _s_e_q  (default "7")
 
-                                                             Happy lv'ing!
+       -Sr<_s_e_q>
+              Set ANSI Reverse sequence to _s_e_q   (default "7")
+
+       -Sb<_s_e_q>
+              Set ANSI Blink sequence to _s_e_q     (default "5")
+
+       -Su<_s_e_q>
+              Set ANSI Underline sequence to _s_e_q (default "4")
+
+       -Sh<_s_e_q>
+              Set ANSI Highlight sequence to _s_e_q (default "1")
+
+              These  sequences are inserted between ``ESC ['' and
+              ``m'' to construct full ANSI escape sequences.
+
+       -T<_n_u_m_b_e_r>
+              Set  Threshold-code  which  divides  Unicode  code-
+              points  in two regions. Characters belonging to the
+              lower region are assumed to have a  width  of  one,
+              and the higher characters are equated to a width of
+              two. (Default: 12288, = 0x3000)
+
+       -m     Force  Unicode  code-points  which  have  the  same
+              glyphs  as iso-8859-* to be Mapped to iso-8859-* in
+              a conversion from Unicode to another character  set
+              which  also  has  the corresponding code-points, in
+              particular, Asian charsets.
+
+       -a     Adjust character set for search pattern (default)
+
+       -c     Allow ANSI escape  sequences  for  text  decoration
+              (Color)
+
+       -d, -i Make regexp-searches ignore case (case folD search)
+              (default)
+
+       -f     Substitute Fixed strings for regular expressions
+
+       -k     Convert X0201 Katakana to X0208 while decoding
+
+       -l     Allow physical lines of each logical  line  printed
+              on  the screen to be concatenated for cut and paste
+              after screen refresh
+
+       -s     Force old pages to be swept  out  from  the  screen
+              Smoothly
+
+       -u     Unify  several  character  sets,  eg. JIS X0208 and
+              C6226.  In addition, lv equates ISO  646  variants,
+              eg.  JIS  X0201-Roman,  and  unknown  charsets with
+              ASCII.
+
+       -g     Turn on lgrep mode.
+
+       -n     Prefix each line of output  with  the  line  number
+              within its input file on lgrep.
+
+       -v     Invert the sense of matching on lgrep.
+
+       -z     Enable  HZ auto-detection (also enabled by run-time
+              C-t).
+
+       -+     Clear all options
+              You can also  turn  OFF  specified  options,  using
+              ``+<option>'' like +c, +d, ... +z.
+
+       -      Treat the following arguments as filenames
+
+       _g_r_e_p _p_a_t_t_e_r_n
+              lv works like _g_r_e_p (1) when its name is _l_g_r_e_p
+
+       -V     Show lv version
+
+       -h     Show this help
+
+CCOONNFFIIGGUURRAATTIIOONN
+       Options  can  be  described  in configuration file ``.lv''
+       (``_lv'' on MSDOS) located at you HOME directory.  If  and
+       only  if  you use MSDOS, you can locate ``_lv'' at current
+       working directory.  They can  be  also  described  in  the
+       environment  variable  LV.   Every  configuration  will be
+       overloaded in this order if there is. Command line options
+       are always read finally.
+
+CCOOMMMMAANNDD KKEEYY BBIINNDDIINNGGSS
+       0..9:  Argument
+
+       g, <:  Jump to the line number (default: top of the file)
+
+       G, >:  Jump  to  the  line  number (default: bottom of the
+              file)
+
+       p:     Jump to the percentage  position  in  line  numbers
+              (0-100)
+
+       b, C-b:
+              Previous page
+
+       u, C-u:
+              Previous half page
+
+       k, w, C-k, y, C-y, C-p:
+              Previous line
+
+       j, C-j, e, C-e, C-n, CR:
+              Next line
+
+       d, C-d:
+              Next half page
+
+       f, C-f, C-v, SP:
+              Next page
+
+       F:     Jump  to the end of file, and wait for a data to be
+              appended to the file until interrupted.
+
+       /<string>:
+              Find a string in  the  forward  direction  (regular
+              expression)
+
+       ?<string>:
+              Find  a  string  in the backward direction (regular
+              expression)
+
+       n:     Repeat previous search in forward direction
+
+       N:     Repeat previous search in backward  direction  (not
+              REVERSE)
+
+       C-l:   Redisplay all lines
+
+       r, C-r:
+              Refresh screen and memory
+
+       R:     Reload current file
+
+       :n:    Examine the next file
+
+       :p:    Examine the previous file
+
+       t:     Toggle input coding systems
+
+       T:     Toggle input coding systems reversely
+
+       C-t:   Toggle HZ decoding mode
+
+       v:     Launch the editor defined by option -E
+
+       C-g, =:
+              Show  file  information (filename, position, coding
+              system)
+
+       V:     Show LV version
+
+       C-z:   Suspend (call SHELL or ``command.com'' under MSDOS)
+
+       q, Q:  Quit
+
+       UP/DOWN:
+              Previous/Next line
+
+       LEFT/RIGHT:
+              Previous/Next half page
+
+       PageUp/PageDown:
+              Previous/Next page
+
+HHOOWW TTOO IINNPPUUTT SSEEAARRCCHH SSTTRRIINNGGSS??
+       C-m, Enter:
+              Enter the current string
+
+       C-h, BS, DEL:
+              Delete one character (backspace)
+
+       C-u:   Cancel the current string and try again
+
+       C-p:   Restore a few old strings incrementally (history)
+
+       C-g:   Quit
+
+RREEGGUULLAARR EEXXPPRREESSSSIIOONN
+       Special  characters  are ^, $, ., *, +, ?, [, ^, -,  ], \.
+       \| specifies an alternative. \(, \)  is  a  grouping  con-
+       struct.  \1 and \2 matches any charset consists of one- or
+       two- column(s) characters respectively. Mutually  overlap-
+       ping ranges (or charset) are not guaranteed.
+
+SSEEEE AALLSSOO
+       LV Homepage: http://www.ff.iij4u.or.jp/~nrt/lv/
+
+CCOOPPYYRRIIGGHHTT
+       All  rights  reserved.  Copyright  (C) 1996-2004 by NARITA
+       Tomio.
+
+       This program is free software;  you  can  redistribute  it
+       and/or modify it under the terms of the GNU General Public
+       License as published  by  the  Free  Software  Foundation;
+       either  version  2 of the License, or (at your option) any
+       later version.
+
+       This program is distributed in the hope that  it  will  be
+       useful, but WITHOUT ANY WARRANTY; without even the implied
+       warranty of MERCHANTABILITY or FITNESS  FOR  A  PARTICULAR
+       PURPOSE.   See  the  GNU  General  Public License for more
+       details.
+
+       You should have received a copy of the GNU General  Public
+       License along with this program; if not, write to the Free
+       Software Foundation, Inc., 59  Temple  Place,  Suite  330,
+       Boston, MA  02111-1307  USA
+
+BBUUGG RREEPPOORRTT
+       Please send bug reports to: nrt@ff.iij4u.or.jp
+
+
+
+                      v.4.51 (Jan.16th,2004)                LV(1)
